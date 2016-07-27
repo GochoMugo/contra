@@ -14,6 +14,7 @@ ret_val = None
 line_id = re.sub("[^\w\d]", "_", src_file)
 
 func = re.sub('\(.*', '', func_raw);
+out_type = re.search("\((\w+)", func_raw).group(1)
 test = re.match("^\s*\*\s*(.+)\s*\=\>\s*(.+)\s*\#\>\s*(.+)\s*$", test_raw)
 
 if test:
@@ -41,9 +42,17 @@ if args is None or out is None or ret_val is None:
 
 print ""
 print "void tests_contra_inline_%s_L%s(void **state) {" % (line_id, line_no)
-print "\tchar *out = NULL;"
+
+if out_type == "int": print "\tint out = -1;"
+else: print "\t%s *out = NULL;" % out_type
+
 print "\tassert_int_equal(%s(&out, %s), %s);" % (func, args, ret_val)
+
 if out != "NULL":
-    print "\tassert_string_equal(out, %s);" % out
-print "\tfree(out);"
+    if out_type == "int": print "\tassert_int_equal(out, %s);" % out
+    else: print "\tassert_string_equal(out, %s);" % out
+
+if out_type == "int": pass
+else: print "\tfree(out);"
+
 print "}"

@@ -205,6 +205,7 @@ _cleanup
  * 4.1 Set 'out' to 'segment1'
  * 4.1. If 'segment2' does not start with a '/', append '/' to 'out'
  * 4.2. Append 'segment2' to 'out' and return 'out'
+ * #endpseudocode
  */
 int
 contra_path_join(char **out, const char *segment1, const char *segment2) {
@@ -306,8 +307,6 @@ contra_path_normalize(char **out, const char *path) {
 
     picked = malloc(sizeof(int) * segments_num);
     if (is_null(picked)) return_err_now(ERR(MALLOC));
-
-    memset(picked, -1, segments_num);
 
     for (i = 0; i < segments_num; i++) {
         /* ignore empty strings from sequential path separators e.g. "//" */

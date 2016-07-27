@@ -220,8 +220,11 @@ _cleanup
 /**
  * #tests
  * "/home/gochomugo/todo.txt"   => "txt"
+ * "/home/gochomugo/todo"       => ""
  * "/home/gochomugo/"           => ""
  * "/"                          => ""
+ * "."                          => ""
+ * ".."                         => ""
  * ""                           => ""
  * #endtests
  */
@@ -231,9 +234,20 @@ contra_path_extname(char **out, const char *path) {
 }
 
 
+/**
+ * #tests
+ * "/root"                      => true
+ * "/"                          => true
+ * "projects"                   => false
+ * "projects/"                  => false
+ * "."                          => false
+ * ".."                         => false
+ * ""                           => false
+ * #endtests
+ */
 int
 contra_path_is_abs(int *out, const char *path) {
-    int ret_code;
+    int ret_code = 0;
 
     assert(path);
 

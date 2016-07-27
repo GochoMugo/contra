@@ -1,0 +1,6 @@
+# build artefacts
+build/
+!build/Makefile
+
+# inline tests
+test/src_*

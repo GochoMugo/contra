@@ -17,6 +17,7 @@ contra_path__substr(char **out, const char *path, int last_char, int direction) 
     size_t path_len = -1;
     const char *suffix = NULL;
     size_t suffix_len = -1;
+    char *last_slash = NULL;
     char *new_path = NULL;
     size_t new_path_len = -1;
 
@@ -32,6 +33,16 @@ contra_path__substr(char **out, const char *path, int last_char, int direction) 
     }
 
     suffix_len = strlen(suffix);
+
+    /* if the suffix is not '/', ensure the found 'last_char'
+     * is after the last '/' */
+    if ('/' != last_char) {
+        last_slash = rindex(path, '/');
+        if (!(is_null(last_slash)) && strlen(last_slash) < suffix_len) {
+            suffix = path + path_len;
+            suffix_len = 0;
+        }
+    }
 
     if (CONTRA_PATH__DIRECTION_LEFT == direction) new_path_len = path_len - suffix_len;
     else new_path_len = suffix_len;
@@ -152,6 +163,8 @@ _cleanup
  * #tests
  * "/home/gochomugo/todo.txt"   => "/home/gochomugo/todo"
  * "todo.txt"                   => "todo"
+ * "/home/gocho.mugo/todo.txt"  => "/home/gocho.mugo/todo"
+ * "/home/gocho.mugo/todo"      => "/home/gocho.mugo/todo"
  * "/home/gochomugo/"           => "/home/gochomugo/"
  * "/home/gochomugo//"          => "/home/gochomugo//"
  * ""                           => ""

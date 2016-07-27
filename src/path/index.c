@@ -111,6 +111,7 @@ _cleanup
  * "/home/gochomugo/todo.txt"   => "todo.txt"
  * "/home/gochomugo/projects"   => "projects"
  * "/home/gochomugo/"           => "gochomugo"
+ * "/home/gochomugo//"          => "gochomugo"
  * "/"                          => ""
  * ""                           => ""
  * #endtests
@@ -126,6 +127,7 @@ contra_path_basename(char **out, const char *path) {
  * "/home/gochomugo/todo.txt"   => "/home/gochomugo/todo"
  * "todo.txt"                   => "todo"
  * "/home/gochomugo/"           => "/home/gochomugo/"
+ * "/home/gochomugo//"          => "/home/gochomugo//"
  * ""                           => ""
  * #endtests
  */
@@ -139,13 +141,40 @@ contra_path_noext(char **out, const char *path) {
  * #tests
  * "/home/gochomugo/todo.txt"   => "/home/gochomugo"
  * "/home/gochomugo/"           => "/home"
- * "/"                          => ""
- * ""                           => ""
+ * "/"                          => "/"
+ * "."                          => "."
+ * ".."                         => "."
+ * ""                           => "."
  * #endtests
+ *
+ * #pseudocode
+ * 1. If 'path' equals "/", return "/"
+ * 2. If 'path' does not contain '/', return "."
+ * 3. Otherwise, right-trim '/' and substring to the last '/'
+ * #endpseudocode
  */
 int
 contra_path_dirname(char **out, const char *path) {
-    return contra_path__rtrim_substr(out, path, '/', CONTRA_PATH__DIRECTION_LEFT);
+    int ret_code = 0;
+    char *dirname = NULL;
+
+    if (1 == strlen(path) && '/' == path[0]) {
+        dirname = strdup("/");
+        if (is_null(dirname)) return_err_now(ERR(MALLOC));
+    } else if (is_null(rindex(path, '/'))) {
+        dirname = strdup(".");
+        if (is_null(dirname)) return_err_now(ERR(MALLOC));
+    } else {
+        ret_code = contra_path__rtrim_substr(&dirname, path, '/', CONTRA_PATH__DIRECTION_LEFT);
+        return_err(ret_code);
+    }
+
+    *out = dirname;
+
+_on_error
+    if (NULL != dirname) free(dirname);
+_cleanup
+    return ret_code;
 }
 
 

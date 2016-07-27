@@ -255,10 +255,31 @@ _cleanup
  * "/home/gochomugo/.."         => "/home"
  * "/home/gochomugo/."          => "/home/gochomugo"
  * "/home/../root"              => "/root"
+ * "projects//../dir"           => "dir"
+ * "projects/../dir/"           => "dir"
+ * "//home//gochomugo//"        => "/home/gochomugo"
+ * "/home/..//../projects/"     => "/projects"
  * "."                          => "."
  * ".."                         => ".."
  * ""                           #> CONTRA_ERR_BAD_ARGS
  * #endtests
+ *
+ * #pseudocode
+ * 1. If 'path' is falsey, return CONTRA_ERR_BAD_ARGS
+ * 2. Split 'path' into segments using '/'
+ * 3. For each of this segment:
+ * 3.1. If segment is empty ("" due to consecutive '/'s), ignore segment
+ * 3.2. If segment is '..':
+ * 3.2.1. If no segment is picked or previous segment is '..':
+ * 3.2.1.1. If 'path' is absolute, ignore segment
+ * 3.2.1.2. Else, pick segment
+ * 3.2.2. If previous segment is '.', replace it
+ * 3.2.3. Else unpick previous segment
+ * 3.3. Else if segment is '.':
+ * 3.3.1. If no segment is picked, pick segment
+ * 3.3.2. Else ignore this segment
+ * 3.4. Else pick segment
+ * #endpseudocode
  */
 int
 contra_path_normalize(char **out, const char *path) {
@@ -290,7 +311,7 @@ contra_path_normalize(char **out, const char *path) {
 
     for (i = 0; i < segments_num; i++) {
         /* ignore empty strings from sequential path separators e.g. "//" */
-        if ('\0' == segments[i]) continue;
+        if ('\0' == segments[i][0]) continue;
 
         /* removing preceding segments on finding ".." */
         if (0 == strcmp(segments[i], "..")) {
@@ -299,7 +320,6 @@ contra_path_normalize(char **out, const char *path) {
             /* if we can not remove any more segments, use this segment */
             if (NULL == token_pre || 0 == strcmp(token_pre, "..")) {
                 if (!is_abs) picked[picked_len++] = i;
-                continue;
             /* if there's a ".", replace it with ".." */
             } else if (0 == strcmp(token_pre, ".")) {
                 picked[picked_len - 1] = i;
@@ -312,14 +332,12 @@ contra_path_normalize(char **out, const char *path) {
             /* if it is the first element to be found, save it */
             if (0 == picked_len && !is_abs) {
                 picked[picked_len++] = i;
-            /* otherwise, ignore it as it is amid other segments */
-            } else {
-                continue;
             }
         /* otherwise, save this 'normal' segment */
         } else {
             picked[picked_len++] = i;
         }
+        token_pre = NULL;
     }
 
     if (0 == picked_len) return_err_now(ERR(BAD_ARGS));
@@ -333,7 +351,7 @@ contra_path_normalize(char **out, const char *path) {
     }
 
     normalized_path = strdup(normalized_path_sds);
-    if (is_null(normalized_path)) return_err(ERR(MALLOC));
+    if (is_null(normalized_path)) return_err_now(ERR(MALLOC));
 
     *out = normalized_path;
 

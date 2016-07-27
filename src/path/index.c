@@ -112,13 +112,39 @@ _cleanup
  * "/home/gochomugo/projects"   => "projects"
  * "/home/gochomugo/"           => "gochomugo"
  * "/home/gochomugo//"          => "gochomugo"
+ * "projects"                   => "projects"
  * "/"                          => ""
+ * "."                          => "."
+ * ".."                         => ".."
  * ""                           => ""
  * #endtests
+ *
+ * #pseudocode
+ * 1. If 'path' does not contain '/', return 'path' as is
+ * 2. Otherwise:
+ * 2.1. Right-trim '/' from 'path'
+ * 2.2. Return substring from the last '/' to end of string
+ * #endpseudocode
  */
 int
 contra_path_basename(char **out, const char *path) {
-    return contra_path__rtrim_substr(out, path, '/', CONTRA_PATH__DIRECTION_RIGHT);
+    int ret_code = 0;
+    char *basename = NULL;
+
+    if (is_null(rindex(path, '/'))) {
+        basename = strdup(path);
+        if (is_null(basename)) return_err_now(ERR(MALLOC));
+    } else {
+        ret_code = contra_path__rtrim_substr(&basename, path, '/', CONTRA_PATH__DIRECTION_RIGHT);
+        return_err(ret_code);
+    }
+
+    *out = basename;
+
+_on_error
+    if (NULL != basename) free(basename);
+_cleanup
+    return ret_code;
 }
 
 

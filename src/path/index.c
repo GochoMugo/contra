@@ -267,6 +267,8 @@ _cleanup
  * "/home/gochomugo/", "/"        => "/home/gochomugo/"
  * "/home/gochomugo", "."         => "/home/gochomugo/."
  * "/home/gochomugo", ".."        => "/home/gochomugo/.."
+ * "gochomugo", "projects"        => "gochomugo/projects"
+ * "gochomugo", "/projects"       => "gochomugo/projects"
  * "/home/gochomugo", NULL        => "/home/gochomugo"
  * "/home/gochomugo", ""          => "/home/gochomugo"
  * NULL, "projects"               => "projects"
@@ -343,7 +345,11 @@ _cleanup
  * "//home//gochomugo//"        => "/home/gochomugo"
  * "/home/..//../projects/"     => "/projects"
  * "."                          => "."
+ * "./."                        => "."
  * ".."                         => ".."
+ * "../.."                      => "../.."
+ * "./.."                       => ".."
+ * "./../."                     => ".."
  * ""                           #> CONTRA_ERR_BAD_ARGS
  * #endtests
  *

@@ -340,6 +340,8 @@ _cleanup
  * "/home/gochomugo/.."         => "/home"
  * "/home/gochomugo/."          => "/home/gochomugo"
  * "/home/../root"              => "/root"
+ * "/home/../.."                => "/"
+ * "/home/../../root"           => "/root"
  * "projects//../dir"           => "dir"
  * "projects/../dir/"           => "dir"
  * "//home//gochomugo//"        => "/home/gochomugo"
@@ -427,9 +429,9 @@ contra_path_normalize(char **out, const char *path) {
         token_pre = NULL;
     }
 
-    if (0 == picked_len) return_err_now(ERR(BAD_ARGS));
-
-    normalized_path_sds = sdscatprintf(sdsempty(), "%s%s", is_abs ? "/" : "", segments[picked[0]]);
+    normalized_path_sds = sdscatprintf(sdsempty(), "%s%s",
+            is_abs ? "/" : "",
+            0 == picked_len ? "" : segments[picked[0]]);
     if (is_null(normalized_path_sds)) return_err_now(ERR(MALLOC));
 
     for (i = 1; i < picked_len; i++) {
@@ -450,3 +452,168 @@ _cleanup
     if (NULL != picked) free(picked);
     return ret_code;
 }
+
+
+/**
+ * #tests
+ * "."                                      => "$(pwd)"
+ * ".."                                     => "$(readlink -f ..)"
+ * "/home/../root"                          => "/root"
+ * "/home/../../root"                       => "/root"
+ * "/home/./gochomugo"                      => "/home/gochomugo"
+ * "/home/../.."                            => "/"
+ * ""                                       => "$(pwd)"
+ * NULL                                     => "$(pwd)"
+ * #endtests
+ *
+ * #pseudocode
+ * 1. If 'path' is falsey, return PWD
+ * 2. Normalize 'path' ('path_normalized')
+ * 3. If 'path_normalized' is absolute, return it
+ * 4. If 'path_normalized's 1st segment is '.':
+ * 4.1. Replace this 1st segment with PWD and STOP
+ * 5. Calculate 'segment_diff' to no. of segments in `pwd` - (minus) no.of '..' segments in 'path_normalized'
+ * 6. If 'segment_diff' is greater than 0:
+ * 6.1. Append to 'out' 'segment_diff' number of segments from `pwd`
+ * 7. Append non-'..' segments from 'path_normalized'
+ * #endpseudocode
+ */
+int
+contra_path_resolve(char **out, const char *path) {
+    int ret_code = 0;
+    char *path_normalized = NULL;
+    int path_normalized_abs = false;
+    sds *path_normalized_sds = NULL;
+    int path_normalized_sds_len = -1;
+    int path_normalized_non_sym = -1;
+    char *pwd = NULL;
+    sds *pwd_sds = NULL;
+    int pwd_sds_len = -1;
+    int segment_diff = -1;
+    sds path_resolved_sds = NULL;
+    char *path_resolved = NULL;
+    int i;
+
+    if (contra_path__falsey(path)) {
+        path_resolved = getcwd(NULL, 0);
+        if (is_null(path_resolved)) return_err_now(errno);
+
+        *out = path_resolved;
+        return_ok(ret_code);
+    }
+
+    ret_code = contra_path_normalize(&path_normalized, path);
+    return_err(ret_code);
+
+    ret_code = contra_path_is_abs(&path_normalized_abs, path_normalized);
+    return_err(ret_code);
+
+    if (path_normalized_abs) {
+        path_resolved = strdup(path_normalized);
+        if (is_null(path_resolved)) return_err_now(ERR(MALLOC));
+
+        *out = path_resolved;
+        return_ok(ret_code);
+    }
+
+    path_normalized_sds = sdssplitlen(path, strlen(path), "/", 1, &path_normalized_sds_len);
+    if (is_null(path_normalized_sds)) return_err_now(ERR(MALLOC));
+
+    pwd = getcwd(NULL, 0);
+    if (is_null(pwd)) return_err_now(ERR(MALLOC));
+
+    path_resolved_sds = sdsempty();
+    if (is_null(path_resolved_sds)) return_err_now(ERR(MALLOC));
+
+    if (0 == strcmp(path_normalized_sds[0], ".")) {
+        path_resolved_sds = sdscatprintf(path_resolved_sds, "%s", pwd);
+        if (is_null(path_resolved_sds)) return_err_now(ERR(MALLOC));
+
+        for (i = 1; i < path_normalized_sds_len; i++) {
+            path_resolved_sds = sdscatprintf(path_resolved_sds, "/%s", path_normalized_sds[i]);
+            if (is_null(path_resolved_sds)) return_err_now(ERR(MALLOC));
+        }
+
+        path_resolved = strdup(path_resolved_sds);
+        if (is_null(path_resolved)) return_err_now(ERR(MALLOC));
+
+        *out = path_resolved;
+        return_ok(ret_code);
+    }
+
+    /** NOTE: absolute paths have a leading '/', thus will result
+     * in the first token being empty i.e. "". We are handling
+     * this as we go, rather than use a separate function for it
+     * as it will involve more memory allocation just for that */
+    pwd_sds = sdssplitlen(pwd, strlen(pwd), "/", 1, &pwd_sds_len);
+    if (is_null(pwd_sds)) return_err_now(ERR(MALLOC));
+
+    i = 0;
+    while(i < path_normalized_sds_len &&  0 == strcmp(path_normalized_sds[i], ".."))
+        path_normalized_non_sym = ++i;
+
+    if (0 < path_normalized_non_sym)
+        segment_diff = (pwd_sds_len-1) - path_normalized_non_sym;
+
+    if (0 < segment_diff) {
+        for (i = 1; i <= segment_diff; i++) {
+            path_resolved_sds = sdscatprintf(path_resolved_sds, "/%s", pwd_sds[i]);
+            if (is_null(path_resolved_sds)) return_err_now(ERR(MALLOC));
+        }
+    }
+
+    for (i = path_normalized_sds_len; i < path_normalized_sds_len; i++) {
+        path_resolved_sds = sdscatprintf(path_resolved_sds, "/%s", path_normalized_sds[i]);
+        if (is_null(path_resolved_sds)) return_err_now(ERR(MALLOC));
+    }
+
+    path_resolved = strdup(path_resolved_sds);
+    if (is_null(path_resolved)) return_err_now(ERR(MALLOC));
+
+    *out = path_resolved;
+
+_on_error
+    if (not_null(path_resolved)) free(path_resolved);
+_cleanup
+    if (not_null(path_normalized)) free(path_normalized);
+    if (not_null(path_normalized_sds)) sdsfreesplitres(path_normalized_sds, path_normalized_sds_len);
+    if (not_null(pwd)) free(pwd);
+    if (not_null(pwd_sds)) sdsfreesplitres(pwd_sds, pwd_sds_len);
+    if (not_null(path_resolved_sds)) sdsfree(path_resolved_sds);
+    return ret_code;
+};
+
+
+/**
+ * #tests
+ * "/home/gochomugo", "/home/forfuture"     => "../forfuture"
+ * "/home/gochomugo", "project"             => "./project"
+ * "/home/", "./project"                    => "$(sed -r -e s/\\/home/./ <<< "${PWD}")/project"
+ * "/home/", "../project"                   => "$(sed -r -e s/\\/home/./ -e s/\\/\\w+$// <<< "${PWD}")/project"
+ * "/home/gochomugo", ""                    => "."
+ * "gochomugo", "project"                   => "../project"
+ * ".", "project"                           => "./project"
+ * "..", "projects"                         => "./$(basename `pwd`)/projects"
+ * "../..", "sample"                        => "./$(basename `dirname "${PWD}"`)/$(basename `pwd`)/sample"
+ * ".", "/root"                             => "$(sed -r -e s/^\\/// -e s/\\/\\w+/../g <<< "${PWD}")/root"
+ * "gochomugo", "/root"                     => "$(sed -r -e s/^\\/// -e s/\\/\\w+/../g <<< "${PWD}")/../root"
+ * ".", "/home/forfuture"                   => "$(sed -r -e s/^\\/home// -e s/\\w+/../g <<< "${PWD}")/forfuture"
+ * "gochomugo", "/home/forfuture"           => "$(sed -r -e s/^\\/home// -e s/\\w+/../g <<< "${PWD}")/../forfuture"
+ * "/home", NULL                            #> CONTRA_ERR_BAD_ARGS
+ * #endtests
+ *
+ * #pseudocode
+ * 1. If 'to' is `NULL`, throw error CONTRA_ERR_BAD_ARGS
+ * 2. Resolve both 'from' ('from_resolved') and 'to' ('to_resolved')
+ * 3. Find the common, leading path segments between 'from_resolved' and 'to_resolved'
+ * 4. If there are zero common segments:
+ * 4.1. Set 'out' to '../' * (times) number of segments in 'from_resolved'
+ * 4.2. Append segments in 'to_resolved' to 'out'
+ * 5. Else if there are zero non-common segments:
+ * 5.1. Set 'out' to '.'
+ * 5.2. Append the non-common segments in 'to_resolved' to 'out'
+ * 6. Else:
+ * 6.1. Set 'out' to '../' * (times) number of non-common segments in 'from_resolved'
+ * 6.2. Append the non-common segments in 'to_resolved' to 'out'
+ * #endpseudocode
+ */

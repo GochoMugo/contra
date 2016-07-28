@@ -42,7 +42,7 @@ if args is None or out is None or ret_val is None:
     sys.exit(1)
 
 def eval(string):
-    return "\"%s\"" % subprocess.check_output("echo %s" % string, shell=True).strip()
+    return "\"%s\"" % subprocess.check_output("echo %s" % string, shell=True, executable='/bin/bash').strip()
 
 print ""
 print "void tests_contra_inline_%s_L%s(void **state) {" % (line_id, line_no)

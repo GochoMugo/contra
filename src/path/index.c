@@ -335,6 +335,7 @@ _cleanup
 
 /**
  * #tests
+ * "/home/gochomugo"            => "/home/gochomugo"
  * "/home//gochomugo"           => "/home/gochomugo"
  * "/home/gochomugo//"          => "/home/gochomugo"
  * "/home/gochomugo/.."         => "/home"
@@ -342,6 +343,7 @@ _cleanup
  * "/home/../root"              => "/root"
  * "/home/../.."                => "/"
  * "/home/../../root"           => "/root"
+ * "projects"                   => "projects"
  * "projects//../dir"           => "dir"
  * "projects/../dir/"           => "dir"
  * "//home//gochomugo//"        => "/home/gochomugo"
@@ -462,6 +464,7 @@ _cleanup
  * "/home/../../root"                       => "/root"
  * "/home/./gochomugo"                      => "/home/gochomugo"
  * "/home/../.."                            => "/"
+ * "projects"                               => "$(pwd)/projects"
  * ""                                       => "$(pwd)"
  * NULL                                     => "$(pwd)"
  * #endtests
@@ -470,8 +473,10 @@ _cleanup
  * 1. If 'path' is falsey, return PWD
  * 2. Normalize 'path' ('path_normalized')
  * 3. If 'path_normalized' is absolute, return it
- * 4. If 'path_normalized's 1st segment is '.':
- * 4.1. Replace this 1st segment with PWD and STOP
+ * 4. If 'path_normalized's 1st segment is not '..':
+ * 4.1. Append to 'out' the PWD
+ * 4.2. If 1st segment is '.', ignore it
+ * 4.3. Append the 2nd, 3rd and so on segments and STOP
  * 5. Calculate 'segment_diff' to no. of segments in `pwd` - (minus) no.of '..' segments in 'path_normalized'
  * 6. If 'segment_diff' is greater than 0:
  * 6.1. Append to 'out' 'segment_diff' number of segments from `pwd`
@@ -525,11 +530,12 @@ contra_path_resolve(char **out, const char *path) {
     path_resolved_sds = sdsempty();
     if (is_null(path_resolved_sds)) return_err_now(ERR(MALLOC));
 
-    if (0 == strcmp(path_normalized_sds[0], ".")) {
+    if (0 != strcmp(path_normalized_sds[0], "..")) {
         path_resolved_sds = sdscatprintf(path_resolved_sds, "%s", pwd);
         if (is_null(path_resolved_sds)) return_err_now(ERR(MALLOC));
 
-        for (i = 1; i < path_normalized_sds_len; i++) {
+        i = (0 == strcmp(path_normalized_sds[0], ".")) ? 1 : 0;
+        for (; i < path_normalized_sds_len; i++) {
             path_resolved_sds = sdscatprintf(path_resolved_sds, "/%s", path_normalized_sds[i]);
             if (is_null(path_resolved_sds)) return_err_now(ERR(MALLOC));
         }
@@ -549,6 +555,7 @@ contra_path_resolve(char **out, const char *path) {
     if (is_null(pwd_sds)) return_err_now(ERR(MALLOC));
 
     i = 0;
+    path_normalized_non_sym = 0;
     while(i < path_normalized_sds_len &&  0 == strcmp(path_normalized_sds[i], ".."))
         path_normalized_non_sym = ++i;
 
@@ -562,7 +569,7 @@ contra_path_resolve(char **out, const char *path) {
         }
     }
 
-    for (i = path_normalized_sds_len; i < path_normalized_sds_len; i++) {
+    for (i = path_normalized_non_sym; i < path_normalized_sds_len; i++) {
         path_resolved_sds = sdscatprintf(path_resolved_sds, "/%s", path_normalized_sds[i]);
         if (is_null(path_resolved_sds)) return_err_now(ERR(MALLOC));
     }
@@ -587,33 +594,131 @@ _cleanup
 /**
  * #tests
  * "/home/gochomugo", "/home/forfuture"     => "../forfuture"
- * "/home/gochomugo", "project"             => "./project"
- * "/home/", "./project"                    => "$(sed -r -e s/\\/home/./ <<< "${PWD}")/project"
- * "/home/", "../project"                   => "$(sed -r -e s/\\/home/./ -e s/\\/\\w+$// <<< "${PWD}")/project"
- * "/home/gochomugo", ""                    => "."
+ * "/home/", "./project"                    => "$(sed -r -e s/\\\\/home/./ <<< "${PWD}")/project"
+ * "/home/", "."                            => "$(sed -r -e s/\\\\/home/./ <<< "${PWD}")"
+ * "/home/", ""                             => "$(sed -r -e s/\\\\/home/./ <<< "${PWD}")"
+ * "/home/", NULL                           => "$(sed -r -e s/\\\\/home/./ <<< "${PWD}")"
+ * "/home/", "../project"                   => "$(sed -r -e s/\\\\/home/./ -e s/\\\\/\\\\w+$// <<< "${PWD}")/project"
+ * "/home/", ".."                           => "$(sed -r -e s/\\\\/home/./ -e s/\\\\/\\\\w+$// <<< "${PWD}")"
  * "gochomugo", "project"                   => "../project"
  * ".", "project"                           => "./project"
- * "..", "projects"                         => "./$(basename `pwd`)/projects"
- * "../..", "sample"                        => "./$(basename `dirname "${PWD}"`)/$(basename `pwd`)/sample"
- * ".", "/root"                             => "$(sed -r -e s/^\\/// -e s/\\/\\w+/../g <<< "${PWD}")/root"
- * "gochomugo", "/root"                     => "$(sed -r -e s/^\\/// -e s/\\/\\w+/../g <<< "${PWD}")/../root"
- * ".", "/home/forfuture"                   => "$(sed -r -e s/^\\/home// -e s/\\w+/../g <<< "${PWD}")/forfuture"
- * "gochomugo", "/home/forfuture"           => "$(sed -r -e s/^\\/home// -e s/\\w+/../g <<< "${PWD}")/../forfuture"
- * "/home", NULL                            #> CONTRA_ERR_BAD_ARGS
+ * "..", "projects"                         => "./$(basename "${PWD}")/projects"
+ * "../..", "sample"                        => "./$(basename `dirname "${PWD}"`)/$(basename "${PWD}")/sample"
+ * ".", "/root"                             => "$(sed -r -e s/^\\\\W+// -e s/\\\\w+/../g <<< "${PWD}")/root"
+ * "gochomugo", "/root"                     => "$(sed -r -e s/^\\\\W+// -e s/\\\\w+/../g <<< "${PWD}")/../root"
+ * ".", "/home/forfuture"                   => "$(sed -e s/home// -r -e s/^\\\\W+// -e s/home// -e s/\\\\w+/../g <<< "${PWD}")/forfuture"
+ * "gochomugo", "/home/forfuture"           => "$(sed -e s/home// -r -e s/^\\\\W+// -e s/\\\\w+/../g <<< "${PWD}")/../forfuture"
+ * "", ""                                   => "."
+ * "", NULL                                 => "."
+ * NULL, ""                                 => "."
+ * NULL, NULL                               => "."
  * #endtests
  *
  * #pseudocode
- * 1. If 'to' is `NULL`, throw error CONTRA_ERR_BAD_ARGS
- * 2. Resolve both 'from' ('from_resolved') and 'to' ('to_resolved')
- * 3. Find the common, leading path segments between 'from_resolved' and 'to_resolved'
- * 4. If there are zero common segments:
- * 4.1. Set 'out' to '../' * (times) number of segments in 'from_resolved'
- * 4.2. Append segments in 'to_resolved' to 'out'
- * 5. Else if there are zero non-common segments:
- * 5.1. Set 'out' to '.'
+ * 1. Resolve both 'from' ('from_resolved') and 'to' ('to_resolved')
+ * 2. Find the common, leading path segments between 'from_resolved' and 'to_resolved'
+ * 3. If there are zero common segments:
+ * 3.1. Set 'out' to '../' * (times) number of segments in 'from_resolved'
+ * 3.2. Append segments in 'to_resolved' to 'out'
+ * 4. Else if there are zero non-common segments in 'from_resolved':
+ * 4.1. Set 'out' to '.'
+ * 4.2. Append the non-common segments in 'to_resolved' to 'out'
+ * 5. Else:
+ * 5.1. Set 'out' to '../' * (times) number of non-common segments in 'from_resolved'
  * 5.2. Append the non-common segments in 'to_resolved' to 'out'
- * 6. Else:
- * 6.1. Set 'out' to '../' * (times) number of non-common segments in 'from_resolved'
- * 6.2. Append the non-common segments in 'to_resolved' to 'out'
  * #endpseudocode
  */
+int
+contra_path_relative(char **out, const char *from, const char *to) {
+    int ret_code = 0;
+    char *from_r = NULL;
+    char *to_r = NULL;
+    sds *from_r_sdsl = NULL;
+    int from_r_sdsl_len = -1;
+    sds *to_r_sdsl = NULL;
+    int to_r_sdsl_len = -1;
+    int non_common = -1;
+    sds path_r_sds = NULL;
+    char *path_r = NULL;
+    int i;
+
+    ret_code = contra_path_resolve(&from_r, from);
+    return_err(ret_code);
+
+    ret_code = contra_path_resolve(&to_r, to);
+    return_err(ret_code);
+
+    from_r_sdsl = sdssplitlen(from_r, strlen(from_r), "/", 1, &from_r_sdsl_len);
+    if (is_null(from_r_sdsl)) return_err_now(ERR(MALLOC));
+
+    to_r_sdsl = sdssplitlen(to_r, strlen(to_r), "/", 1, &to_r_sdsl_len);
+    if (is_null(to_r_sdsl)) return_err_now(ERR(MALLOC));
+
+    i = 1;
+    while(i < min(from_r_sdsl_len, to_r_sdsl_len) && 0 == strcmp(from_r_sdsl[i], to_r_sdsl[i])) i++;
+    non_common = i;
+
+    path_r_sds = sdsempty();
+    if (is_null(path_r_sds)) return_err_now(ERR(MALLOC));
+
+    if (1 == non_common) {
+        for (i = 1; i < from_r_sdsl_len; i++) {
+            path_r_sds = sdscatprintf(path_r_sds, "../");
+            if (is_null(path_r_sds)) return_err_now(ERR(MALLOC));
+        }
+
+        for (i = 1; i < to_r_sdsl_len; i++) {
+            path_r_sds = sdscatprintf(path_r_sds, "%s%s", to_r_sdsl[i],
+                    i == (to_r_sdsl_len-1) ? "" : "/");
+            if (is_null(path_r_sds)) return_err_now(ERR(MALLOC));
+        }
+
+        path_r = strdup(path_r_sds);
+        if (is_null(path_r)) return_err_now(ERR(MALLOC));
+
+        *out = path_r;
+        return_ok(ret_code);
+    }
+
+    if (non_common == from_r_sdsl_len) {
+        path_r_sds = sdscatprintf(path_r_sds, ".");
+        if (is_null(path_r_sds)) return_err_now(ERR(MALLOC));
+
+        for (i = non_common; i < to_r_sdsl_len; i++) {
+            path_r_sds = sdscatprintf(path_r_sds, "/%s", to_r_sdsl[i]);
+            if (is_null(path_r_sds)) return_err_now(ERR(MALLOC));
+        }
+
+        path_r = strdup(path_r_sds);
+        if (is_null(path_r)) return_err_now(ERR(MALLOC));
+
+        *out = path_r;
+        return_ok(ret_code);
+    }
+
+    for (i = 1; i <= (from_r_sdsl_len - non_common); i++) {
+        path_r_sds = sdscatprintf(path_r_sds, "../");
+        if (is_null(path_r_sds)) return_err_now(ERR(MALLOC));
+    }
+
+    for (i = non_common; i < to_r_sdsl_len; i++) {
+        path_r_sds = sdscatprintf(path_r_sds, "%s%s", to_r_sdsl[i],
+                i == (to_r_sdsl_len-1) ? "" : "/");
+        if (is_null(path_r_sds)) return_err_now(ERR(MALLOC));
+    }
+
+    path_r = strdup(path_r_sds);
+    if (is_null(path_r)) return_err_now(ERR(MALLOC));
+
+    *out = path_r;
+
+_on_error
+    if (not_null(path_r)) free(path_r);
+_cleanup
+    if (not_null(from_r)) free(from_r);
+    if (not_null(to_r)) free(to_r);
+    if (not_null(from_r_sdsl)) sdsfreesplitres(from_r_sdsl, from_r_sdsl_len);
+    if (not_null(to_r_sdsl)) sdsfreesplitres(to_r_sdsl, to_r_sdsl_len);
+    if (not_null(path_r_sds)) sdsfree(path_r_sds);
+    return ret_code;
+}

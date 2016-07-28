@@ -131,21 +131,9 @@ contra_path_resolve(char **out, const char *path);
  * @param  out Relative path
  * @param  from From
  * @param  to To
- * @return 0 or CONTRA_ERR_BAD_ARGS if 'to' is NULL
- */
-int
-contra_path_relative(char **out, const char *from, const char *to);
-
-
-/**
- * Similar to `contra_path_resolve` but allows variadic arguments.
- *
- * @param  out Absolute path
- * @param  ... Path segments
  * @return 0 or error code
  */
 int
-contra_path_resolve_v(char **out, ...);
-
+contra_path_relative(char **out, const char *from, const char *to);
 
 #endif

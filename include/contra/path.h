@@ -114,18 +114,6 @@ contra_path_parse(contra_path_struct **out, const char *path);
 
 
 /**
- * Return a relative path from 'from' to 'to'.
- *
- * @param  out Relative path
- * @param  from From
- * @param  to To
- * @return 0 or error code
- */
-int
-contra_path_relative(char **out, const char *from, const char *to);
-
-
-/**
  * Resolve a path into an absolute path.
  *
  * @param  out Absolute path
@@ -134,6 +122,19 @@ contra_path_relative(char **out, const char *from, const char *to);
  */
 int
 contra_path_resolve(char **out, const char *path);
+
+
+/**
+ * Return a relative path from 'from' to 'to'.
+ * If 'from' is `NULL`, we assume the current working directory as 'from'.
+ *
+ * @param  out Relative path
+ * @param  from From
+ * @param  to To
+ * @return 0 or CONTRA_ERR_BAD_ARGS if 'to' is NULL
+ */
+int
+contra_path_relative(char **out, const char *from, const char *to);
 
 
 /**

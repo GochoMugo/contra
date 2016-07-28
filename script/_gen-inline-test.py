@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import re
+import subprocess
 import sys
 
 func_raw = sys.argv[1]
@@ -40,6 +41,9 @@ if args is None or out is None or ret_val is None:
     print "FAIL!"
     sys.exit(1)
 
+def eval(string):
+    return "\"%s\"" % subprocess.check_output("echo %s" % string, shell=True).strip()
+
 print ""
 print "void tests_contra_inline_%s_L%s(void **state) {" % (line_id, line_no)
 
@@ -50,7 +54,7 @@ print "\tassert_int_equal(%s(&out, %s), %s);" % (func, args, ret_val)
 
 if out != "NULL":
     if out_type == "int": print "\tassert_int_equal(out, %s);" % out
-    else: print "\tassert_string_equal(out, %s);" % out
+    else: print "\tassert_string_equal(out, %s);" % eval(out)
 
 if out_type == "int": pass
 else: print "\tfree(out);"

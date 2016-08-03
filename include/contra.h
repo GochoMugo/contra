@@ -30,6 +30,7 @@
 
 #include "contra/types.h"
 #include "contra/error.h"
+#include "contra/is.h"
 #include "contra/path.h"
 
 #endif

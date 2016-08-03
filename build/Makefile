@@ -26,6 +26,7 @@ TEST_DIR       = $(ROOT)/test
 SRC_TEST       = $(TEST_DIR)/*.c
 OUT_TEST       = $(PWD)/test
 EXE_TEST       = $(PWD)/test-contra
+EXE_TEST_RUN   = $(ROOT)/test/run.sh
 
 
 .PHONY: clean install pc veryclean test
@@ -41,6 +42,7 @@ test:
 	@make $(LIB) $(EXE_TEST)
 	@$(ECHO) RUN $(EXE_TEST) ; TEST_DIR=$(TEST_DIR) \
 		$(EXE_TEST)
+	@$(ECHO) RUN $(EXE_TEST_RUN) ; TEST_DIR=$(TEST_DIR) $(EXE_TEST_RUN)
 
 $(EXE_TEST): $(SRC_TEST)
 	@mkdir -p $(OUT_TEST)

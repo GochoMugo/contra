@@ -1,0 +1,34 @@
+{
+  "name": "contra",
+  "version": "0.0.0",
+  "description": "Node.js bindings to Contra library",
+  "main": "index.js",
+  "scripts": {
+    "build": "node-gyp rebuild",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/GochoMugo/contra.git"
+  },
+  "keywords": [
+    "contra",
+    "bindings"
+  ],
+  "author": "GochoMugo (www.gmugo.in)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/GochoMugo/contra/issues"
+  },
+  "homepage": "https://github.com/GochoMugo/contra#readme",
+  "dependencies": {
+    "bindings": "^1.2.1"
+  },
+  "devDependencies": {
+    "nan": "^2.4.0",
+    "node-gyp": "^3.4.0"
+  },
+  "include_dirs": [
+    "<!(node -e \"require('nan')\")"
+  ]
+}

@@ -33,7 +33,7 @@ moduleFilenames.forEach(function(moduleFilename) {
     const moduleName = moduleFilename.substring(0, moduleFilename.indexOf(".cc"));
     bindingsData.targets.push({
         "target_name": moduleName,
-        "sources": [ moduleFilename ],
+        "sources": [ "src/" + moduleFilename ],
         "include_dirs": [ "<!(node -e \"require('nan')\")" ],
     });
 });

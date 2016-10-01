@@ -9,3 +9,14 @@
 
 // npm-installed modules
 const bindings = require("bindings");
+
+
+// module variables
+const modules = [
+    "path",
+];
+
+
+modules.forEach(function(moduleName) {
+    exports[moduleName] = bindings(moduleName);
+});

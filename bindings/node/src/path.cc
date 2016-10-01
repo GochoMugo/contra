@@ -8,6 +8,23 @@
 
 
 #include <nan.h>
+#include "../include/bindings.h"
+
+using namespace v8;
 
 
+NAN_METHOD(Basename) {
+    Nan::MaybeLocal<String> pathMaybe = Nan::To<String>(info[0]);
+    if (pathMaybe.IsEmpty()) {
+        Nan::ThrowError("");
+        return;
+    }
+}
 
+
+NAN_MODULE_INIT(Init) {
+    contra_bindings_define_function("basename", Basename);
+}
+
+
+NODE_MODULE(path, Init)

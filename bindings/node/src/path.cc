@@ -6,19 +6,20 @@
  * Copyright (c) 2016 Forfuture, LLC <we@forfuture.co.ke>
  */
 
-
-#include <nan.h>
 #include "../include/bindings.h"
-
-using namespace v8;
 
 
 NAN_METHOD(Basename) {
-    Nan::MaybeLocal<String> pathMaybe = Nan::To<String>(info[0]);
+    Nan::MaybeLocal<v8::String> pathMaybe = Nan::To<v8::String>(info[0]);
     if (pathMaybe.IsEmpty()) {
-        Nan::ThrowError("");
+        Nan::ThrowError("empty path");
         return;
     }
+
+    std::string path = std::string(pathMaybe.ToLocalChecked());
+    char *basename = NULL;
+    int ret_code = contra_path_basename(&basename, path);
+    info.GetReturnValue().Set(basename);
 }
 
 

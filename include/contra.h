@@ -14,7 +14,9 @@
 #define CONTRA_VERSION_MINOR 0
 #define CONTRA_VERSION_PATCH 0
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 
 #include <assert.h>
 #include <errno.h>

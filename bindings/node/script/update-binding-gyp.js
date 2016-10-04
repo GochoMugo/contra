@@ -14,6 +14,7 @@ const path = require("path");
 
 
 // module variables
+const contraIncludePath = path.resolve(__dirname, "../../../include");
 const modulesPath = path.resolve(__dirname, "../src");
 const bindingsPath = path.resolve(__dirname, "../binding.gyp");
 const bindingsData = { targets: [] };
@@ -34,7 +35,10 @@ moduleFilenames.forEach(function(moduleFilename) {
     bindingsData.targets.push({
         "target_name": moduleName,
         "sources": [ "src/" + moduleFilename ],
-        "include_dirs": [ "<!(node -e \"require('nan')\")" ],
+        "include_dirs": [
+            contraIncludePath,
+            "<!(node -e \"require('nan')\")",
+        ],
     });
 });
 

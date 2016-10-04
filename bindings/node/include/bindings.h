@@ -11,6 +11,11 @@
 
 #define contra_bindings_define_function(name, function) \
     Nan::Set(target, Nan::New(name).ToLocalChecked(), \
-            Nan::GetFunction(Nan::New<FunctionTemplate>(function)).ToLocalChecked());
+            Nan::GetFunction(Nan::New<v8::FunctionTemplate>(function)).ToLocalChecked());
+
+
+#include <string>
+#include <nan.h>
+#include <contra.h>
 
 #endif

@@ -21,4 +21,53 @@
 #endif
 
 
+/**
+ * Change mode of file pointed to by 'path'.
+ * See chmod(2).
+ *
+ * @param  path Path to the file
+ * @param  mode The new mode
+ * @return 0 or error code
+ */
+int
+contra_fs_chmod_sync(const char *path, mode_t mode);
+
+
+/**
+ * Change mode of file associated with 'fd'.
+ *
+ * @param  fd File descriptor
+ * @param  mode The new mode
+ * @return 0 or error code
+ */
+int
+contra_fs_fchmod_sync(int fd, mode_t mode);
+
+
+/**
+ * Change ownership of file, pointed to by 'path'.
+ * See chown(2).
+ *
+ * @param  path Path to file
+ * @param  uid User ID
+ * @param  gid Group ID
+ * @return 0 or error code
+ */
+int
+contra_fs_chown_sync(const char *path, uid_t uid, gid_t gid);
+
+
+/**
+ * Change ownership of file, associated with 'fd'.
+ * See chown(2).
+ *
+ * @param  fd File descriptor
+ * @param  uid User ID
+ * @param  gid Group ID
+ * @return 0 or error code
+ */
+int
+contra_fs_fchown_sync(int fd, uid_t uid, gid_t gid);
+
+
 #endif

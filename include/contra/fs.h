@@ -18,6 +18,16 @@
 #define CONTRA_FS_OPEN_READ "r"
 #define CONTRA_FS_OPEN_WRITE "w"
 #define CONTRA_FS_OPEN_READWRITE "rw"
+
+#define CONTRA_FS_OPEN_R
+#define CONTRA_FS_OPEN_R+
+#define CONTRA_FS_OPEN_W
+#define CONTRA_FS_OPEN_W+
+#define CONTRA_FS_OPEN_WX
+#define CONTRA_FS_OPEN_WX+
+#define CONTRA_FS_OPEN_A
+#define CONTRA_FS_OPEN_AX
+#define CONTRA_FS_OPEN_AX+
 #endif
 
 
@@ -35,6 +45,7 @@ contra_fs_chmod_sync(const char *path, mode_t mode);
 
 /**
  * Change mode of file associated with 'fd'.
+ * See fchmod(2).
  *
  * @param  fd File descriptor
  * @param  mode The new mode
@@ -59,7 +70,7 @@ contra_fs_chown_sync(const char *path, uid_t uid, gid_t gid);
 
 /**
  * Change ownership of file, associated with 'fd'.
- * See chown(2).
+ * See fchown(2).
  *
  * @param  fd File descriptor
  * @param  uid User ID
@@ -68,6 +79,19 @@ contra_fs_chown_sync(const char *path, uid_t uid, gid_t gid);
  */
 int
 contra_fs_fchown_sync(int fd, uid_t uid, gid_t gid);
+
+
+/**
+ * Change ownership of symbolic link, pointed to by 'path'.
+ * See lchown(2).
+ *
+ * @param  path Path to symbolic link
+ * @param  uid User ID
+ * @param  gid Group ID
+ * @return 0 or error code
+ */
+int
+contra_fs_lchown_sync(const char *path, uid_t uid, gid_t gid);
 
 
 #endif

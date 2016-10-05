@@ -61,3 +61,16 @@ _on_error
 _cleanup
     return ret_code;
 }
+
+
+int
+contra_fs_lchown_sync(const char *path, uid_t uid, gid_t gid) {
+    int ret_code = 0;
+
+    ret_code = lchown(path, uid, gid);
+    return_err_ext(ret_code, ERR(SYS));
+
+_on_error
+_cleanup
+    return ret_code;
+}

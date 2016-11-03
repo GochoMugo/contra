@@ -28,7 +28,7 @@ exit_code=0
 
 for t in "${tests[@]}"
 do
-    report="$("${rootdir}"/deps/crun/crun.sh "${testdir}/run.c" "${t}" 2>&1)"
+    report="$("${rootdir}"/tools/crun/crun.sh "${testdir}/run.c" "${t}" 2>&1)"
     grep -q -E 'Assertion failed at' <<< "${report}" || {
         echo "[FAILED] contra_assert_${t}"
         echo

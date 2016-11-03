@@ -1,4 +1,4 @@
-#include "main.h"
+#include <test-headers/main.h>
 
 int tests_contra_is_setup_each(void **state) { return 0; }
 int tests_contra_is_teardown_each(void **state) { return 0; }

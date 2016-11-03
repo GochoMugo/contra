@@ -1,9 +1,6 @@
-[submodule "deps/cok"]
-	path = deps/cok
-	url = git@github.com:GochoMugo/cok.git
 [submodule "deps/sds"]
 	path = deps/sds
 	url = https://github.com/antirez/sds.git
-[submodule "deps/crun"]
-	path = deps/crun
+[submodule "tools/crun"]
+	path = tools/crun
 	url = https://github.com/GochoMugo/crun.git

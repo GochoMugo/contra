@@ -1,5 +1,4 @@
-/* test!skip-gen */
-#include "main.h"
+#include <test-headers/main.h>
 
 int main(void) {
     int failed_tests = 0;

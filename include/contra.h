@@ -25,9 +25,9 @@
 #include <strings.h>
 #include <unistd.h>
 
-#include "../deps/cok/include/cok.h"
 #include "../deps/sds/sds.h"
 
+#include "contra/base.h"
 #include "contra/types.h"
 #include "contra/error.h"
 #include "contra/assert.h"

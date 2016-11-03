@@ -1,6 +1,5 @@
 # build artefacts
 build/
-!build/Makefile
 
-# inline tests
-test/src_*
+# python bytecodes
+*.pyc

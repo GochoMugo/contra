@@ -11,10 +11,8 @@
 
 #define assert_ok(expr) assert_int_equal(0 <= expr, 1)
 
-#define CMOCKA_HEADERS
+#include <contra.h>
+{test_header_includes_str}
 
-#include "../include/contra.h"
-
-#define TEST_HEADERS
 
 #endif

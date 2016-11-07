@@ -26,7 +26,7 @@ contra_path__substr(char **out, const char *path, int last_char, int direction) 
     path_len = strlen(path);
 
     suffix = rindex(path, last_char);
-    if (is_null(suffix)) {
+    if (contra_is_null(suffix)) {
         suffix = path + path_len;
     } else {
         if (CONTRA_PATH__DIRECTION_RIGHT == direction) suffix++;
@@ -38,7 +38,7 @@ contra_path__substr(char **out, const char *path, int last_char, int direction) 
      * is after the last '/' */
     if ('/' != last_char) {
         last_slash = rindex(path, '/');
-        if (!(is_null(last_slash)) && strlen(last_slash) < suffix_len) {
+        if (!(contra_is_null(last_slash)) && strlen(last_slash) < suffix_len) {
             suffix = path + path_len;
             suffix_len = 0;
         }
@@ -48,7 +48,7 @@ contra_path__substr(char **out, const char *path, int last_char, int direction) 
     else new_path_len = suffix_len;
 
     new_path = (char *) malloc(new_path_len + 1);
-    if (is_null(new_path)) {
+    if (contra_is_null(new_path)) {
         return_err_now(ERR(MALLOC));
     }
 
@@ -83,7 +83,7 @@ contra_path__rtrim(char **out, const char *path, int needle) {
 
     trimmed_path_len = rindex + 1;
     trimmed_path = (char *) malloc(trimmed_path_len + 1);
-    if (is_null(trimmed_path)) {
+    if (contra_is_null(trimmed_path)) {
         return_err_now(ERR(MALLOC));
     }
 
@@ -142,9 +142,9 @@ contra_path_basename(char **out, const char *path) {
     int ret_code = 0;
     char *basename = NULL;
 
-    if (is_null(rindex(path, '/'))) {
+    if (contra_is_null(rindex(path, '/'))) {
         basename = strdup(path);
-        if (is_null(basename)) return_err_now(ERR(MALLOC));
+        if (contra_is_null(basename)) return_err_now(ERR(MALLOC));
     } else {
         ret_code = contra_path__rtrim_substr(&basename, path, '/', CONTRA_PATH__DIRECTION_RIGHT);
         return_err(ret_code);
@@ -199,10 +199,10 @@ contra_path_dirname(char **out, const char *path) {
 
     if (1 == strlen(path) && '/' == path[0]) {
         dirname = strdup("/");
-        if (is_null(dirname)) return_err_now(ERR(MALLOC));
-    } else if (is_null(rindex(path, '/'))) {
+        if (contra_is_null(dirname)) return_err_now(ERR(MALLOC));
+    } else if (contra_is_null(rindex(path, '/'))) {
         dirname = strdup(".");
-        if (is_null(dirname)) return_err_now(ERR(MALLOC));
+        if (contra_is_null(dirname)) return_err_now(ERR(MALLOC));
     } else {
         ret_code = contra_path__rtrim_substr(&dirname, path, '/', CONTRA_PATH__DIRECTION_LEFT);
         return_err(ret_code);
@@ -306,7 +306,7 @@ contra_path_join(char **out, const char *segment1, const char *segment2) {
         if (!segment1_falsey) path = strdup(segment1);
         else if (!segment2_falsey) path = strdup(segment2);
         else return_err_now(ERR(BAD_ARGS));
-        if (is_null(path)) return_err_now(ERR(MALLOC));
+        if (contra_is_null(path)) return_err_now(ERR(MALLOC));
         *out = path;
         return_ok(ret_code);
     }
@@ -395,10 +395,10 @@ contra_path_normalize(char **out, const char *path) {
     is_abs = ('/' == path[0]);
 
     segments = sdssplitlen(path, path_len, "/", 1, &segments_num);
-    if (is_null(segments)) return_err_now(ERR(MALLOC));
+    if (contra_is_null(segments)) return_err_now(ERR(MALLOC));
 
     picked = malloc(sizeof(int) * segments_num);
-    if (is_null(picked)) return_err_now(ERR(MALLOC));
+    if (contra_is_null(picked)) return_err_now(ERR(MALLOC));
 
     for (i = 0; i < segments_num; i++) {
         /* ignore empty strings from sequential path separators e.g. "//" */
@@ -434,15 +434,15 @@ contra_path_normalize(char **out, const char *path) {
     normalized_path_sds = sdscatprintf(sdsempty(), "%s%s",
             is_abs ? "/" : "",
             0 == picked_len ? "" : segments[picked[0]]);
-    if (is_null(normalized_path_sds)) return_err_now(ERR(MALLOC));
+    if (contra_is_null(normalized_path_sds)) return_err_now(ERR(MALLOC));
 
     for (i = 1; i < picked_len; i++) {
         normalized_path_sds = sdscatprintf(normalized_path_sds, "/%s", segments[picked[i]]);
-        if (is_null(normalized_path_sds)) return_err_now(ERR(MALLOC));
+        if (contra_is_null(normalized_path_sds)) return_err_now(ERR(MALLOC));
     }
 
     normalized_path = strdup(normalized_path_sds);
-    if (is_null(normalized_path)) return_err_now(ERR(MALLOC));
+    if (contra_is_null(normalized_path)) return_err_now(ERR(MALLOC));
 
     *out = normalized_path;
 
@@ -501,7 +501,7 @@ contra_path_resolve(char **out, const char *path) {
 
     if (contra_path__falsey(path)) {
         path_resolved = getcwd(NULL, 0);
-        if (is_null(path_resolved)) return_err_now(errno);
+        if (contra_is_null(path_resolved)) return_err_now(errno);
 
         *out = path_resolved;
         return_ok(ret_code);
@@ -515,33 +515,33 @@ contra_path_resolve(char **out, const char *path) {
 
     if (path_normalized_abs) {
         path_resolved = strdup(path_normalized);
-        if (is_null(path_resolved)) return_err_now(ERR(MALLOC));
+        if (contra_is_null(path_resolved)) return_err_now(ERR(MALLOC));
 
         *out = path_resolved;
         return_ok(ret_code);
     }
 
     path_normalized_sds = sdssplitlen(path, strlen(path), "/", 1, &path_normalized_sds_len);
-    if (is_null(path_normalized_sds)) return_err_now(ERR(MALLOC));
+    if (contra_is_null(path_normalized_sds)) return_err_now(ERR(MALLOC));
 
     pwd = getcwd(NULL, 0);
-    if (is_null(pwd)) return_err_now(ERR(MALLOC));
+    if (contra_is_null(pwd)) return_err_now(ERR(MALLOC));
 
     path_resolved_sds = sdsempty();
-    if (is_null(path_resolved_sds)) return_err_now(ERR(MALLOC));
+    if (contra_is_null(path_resolved_sds)) return_err_now(ERR(MALLOC));
 
     if (0 != strcmp(path_normalized_sds[0], "..")) {
         path_resolved_sds = sdscatprintf(path_resolved_sds, "%s", pwd);
-        if (is_null(path_resolved_sds)) return_err_now(ERR(MALLOC));
+        if (contra_is_null(path_resolved_sds)) return_err_now(ERR(MALLOC));
 
         i = (0 == strcmp(path_normalized_sds[0], ".")) ? 1 : 0;
         for (; i < path_normalized_sds_len; i++) {
             path_resolved_sds = sdscatprintf(path_resolved_sds, "/%s", path_normalized_sds[i]);
-            if (is_null(path_resolved_sds)) return_err_now(ERR(MALLOC));
+            if (contra_is_null(path_resolved_sds)) return_err_now(ERR(MALLOC));
         }
 
         path_resolved = strdup(path_resolved_sds);
-        if (is_null(path_resolved)) return_err_now(ERR(MALLOC));
+        if (contra_is_null(path_resolved)) return_err_now(ERR(MALLOC));
 
         *out = path_resolved;
         return_ok(ret_code);
@@ -552,7 +552,7 @@ contra_path_resolve(char **out, const char *path) {
      * this as we go, rather than use a separate function for it
      * as it will involve more memory allocation just for that */
     pwd_sds = sdssplitlen(pwd, strlen(pwd), "/", 1, &pwd_sds_len);
-    if (is_null(pwd_sds)) return_err_now(ERR(MALLOC));
+    if (contra_is_null(pwd_sds)) return_err_now(ERR(MALLOC));
 
     i = 0;
     path_normalized_non_sym = 0;
@@ -565,28 +565,28 @@ contra_path_resolve(char **out, const char *path) {
     if (0 < segment_diff) {
         for (i = 1; i <= segment_diff; i++) {
             path_resolved_sds = sdscatprintf(path_resolved_sds, "/%s", pwd_sds[i]);
-            if (is_null(path_resolved_sds)) return_err_now(ERR(MALLOC));
+            if (contra_is_null(path_resolved_sds)) return_err_now(ERR(MALLOC));
         }
     }
 
     for (i = path_normalized_non_sym; i < path_normalized_sds_len; i++) {
         path_resolved_sds = sdscatprintf(path_resolved_sds, "/%s", path_normalized_sds[i]);
-        if (is_null(path_resolved_sds)) return_err_now(ERR(MALLOC));
+        if (contra_is_null(path_resolved_sds)) return_err_now(ERR(MALLOC));
     }
 
     path_resolved = strdup(path_resolved_sds);
-    if (is_null(path_resolved)) return_err_now(ERR(MALLOC));
+    if (contra_is_null(path_resolved)) return_err_now(ERR(MALLOC));
 
     *out = path_resolved;
 
 _on_error
-    if (not_null(path_resolved)) free(path_resolved);
+    if (!contra_is_null(path_resolved)) free(path_resolved);
 _cleanup
-    if (not_null(path_normalized)) free(path_normalized);
-    if (not_null(path_normalized_sds)) sdsfreesplitres(path_normalized_sds, path_normalized_sds_len);
-    if (not_null(pwd)) free(pwd);
-    if (not_null(pwd_sds)) sdsfreesplitres(pwd_sds, pwd_sds_len);
-    if (not_null(path_resolved_sds)) sdsfree(path_resolved_sds);
+    if (!contra_is_null(path_normalized)) free(path_normalized);
+    if (!contra_is_null(path_normalized_sds)) sdsfreesplitres(path_normalized_sds, path_normalized_sds_len);
+    if (!contra_is_null(pwd)) free(pwd);
+    if (!contra_is_null(pwd_sds)) sdsfreesplitres(pwd_sds, pwd_sds_len);
+    if (!contra_is_null(path_resolved_sds)) sdsfree(path_resolved_sds);
     return ret_code;
 };
 
@@ -649,32 +649,32 @@ contra_path_relative(char **out, const char *from, const char *to) {
     return_err(ret_code);
 
     from_r_sdsl = sdssplitlen(from_r, strlen(from_r), "/", 1, &from_r_sdsl_len);
-    if (is_null(from_r_sdsl)) return_err_now(ERR(MALLOC));
+    if (contra_is_null(from_r_sdsl)) return_err_now(ERR(MALLOC));
 
     to_r_sdsl = sdssplitlen(to_r, strlen(to_r), "/", 1, &to_r_sdsl_len);
-    if (is_null(to_r_sdsl)) return_err_now(ERR(MALLOC));
+    if (contra_is_null(to_r_sdsl)) return_err_now(ERR(MALLOC));
 
     i = 1;
-    while(i < min(from_r_sdsl_len, to_r_sdsl_len) && 0 == strcmp(from_r_sdsl[i], to_r_sdsl[i])) i++;
+    while(i < contra_math_min(from_r_sdsl_len, to_r_sdsl_len) && 0 == strcmp(from_r_sdsl[i], to_r_sdsl[i])) i++;
     non_common = i;
 
     path_r_sds = sdsempty();
-    if (is_null(path_r_sds)) return_err_now(ERR(MALLOC));
+    if (contra_is_null(path_r_sds)) return_err_now(ERR(MALLOC));
 
     if (1 == non_common) {
         for (i = 1; i < from_r_sdsl_len; i++) {
             path_r_sds = sdscatprintf(path_r_sds, "../");
-            if (is_null(path_r_sds)) return_err_now(ERR(MALLOC));
+            if (contra_is_null(path_r_sds)) return_err_now(ERR(MALLOC));
         }
 
         for (i = 1; i < to_r_sdsl_len; i++) {
             path_r_sds = sdscatprintf(path_r_sds, "%s%s", to_r_sdsl[i],
                     i == (to_r_sdsl_len-1) ? "" : "/");
-            if (is_null(path_r_sds)) return_err_now(ERR(MALLOC));
+            if (contra_is_null(path_r_sds)) return_err_now(ERR(MALLOC));
         }
 
         path_r = strdup(path_r_sds);
-        if (is_null(path_r)) return_err_now(ERR(MALLOC));
+        if (contra_is_null(path_r)) return_err_now(ERR(MALLOC));
 
         *out = path_r;
         return_ok(ret_code);
@@ -682,15 +682,15 @@ contra_path_relative(char **out, const char *from, const char *to) {
 
     if (non_common == from_r_sdsl_len) {
         path_r_sds = sdscatprintf(path_r_sds, ".");
-        if (is_null(path_r_sds)) return_err_now(ERR(MALLOC));
+        if (contra_is_null(path_r_sds)) return_err_now(ERR(MALLOC));
 
         for (i = non_common; i < to_r_sdsl_len; i++) {
             path_r_sds = sdscatprintf(path_r_sds, "/%s", to_r_sdsl[i]);
-            if (is_null(path_r_sds)) return_err_now(ERR(MALLOC));
+            if (contra_is_null(path_r_sds)) return_err_now(ERR(MALLOC));
         }
 
         path_r = strdup(path_r_sds);
-        if (is_null(path_r)) return_err_now(ERR(MALLOC));
+        if (contra_is_null(path_r)) return_err_now(ERR(MALLOC));
 
         *out = path_r;
         return_ok(ret_code);
@@ -698,27 +698,27 @@ contra_path_relative(char **out, const char *from, const char *to) {
 
     for (i = 1; i <= (from_r_sdsl_len - non_common); i++) {
         path_r_sds = sdscatprintf(path_r_sds, "../");
-        if (is_null(path_r_sds)) return_err_now(ERR(MALLOC));
+        if (contra_is_null(path_r_sds)) return_err_now(ERR(MALLOC));
     }
 
     for (i = non_common; i < to_r_sdsl_len; i++) {
         path_r_sds = sdscatprintf(path_r_sds, "%s%s", to_r_sdsl[i],
                 i == (to_r_sdsl_len-1) ? "" : "/");
-        if (is_null(path_r_sds)) return_err_now(ERR(MALLOC));
+        if (contra_is_null(path_r_sds)) return_err_now(ERR(MALLOC));
     }
 
     path_r = strdup(path_r_sds);
-    if (is_null(path_r)) return_err_now(ERR(MALLOC));
+    if (contra_is_null(path_r)) return_err_now(ERR(MALLOC));
 
     *out = path_r;
 
 _on_error
-    if (not_null(path_r)) free(path_r);
+    if (!contra_is_null(path_r)) free(path_r);
 _cleanup
-    if (not_null(from_r)) free(from_r);
-    if (not_null(to_r)) free(to_r);
-    if (not_null(from_r_sdsl)) sdsfreesplitres(from_r_sdsl, from_r_sdsl_len);
-    if (not_null(to_r_sdsl)) sdsfreesplitres(to_r_sdsl, to_r_sdsl_len);
-    if (not_null(path_r_sds)) sdsfree(path_r_sds);
+    if (!contra_is_null(from_r)) free(from_r);
+    if (!contra_is_null(to_r)) free(to_r);
+    if (!contra_is_null(from_r_sdsl)) sdsfreesplitres(from_r_sdsl, from_r_sdsl_len);
+    if (!contra_is_null(to_r_sdsl)) sdsfreesplitres(to_r_sdsl, to_r_sdsl_len);
+    if (!contra_is_null(path_r_sds)) sdsfree(path_r_sds);
     return ret_code;
 }

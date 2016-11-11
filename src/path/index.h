@@ -10,6 +10,10 @@
 #define _CONTRA_src_path_h_ 1
 
 
+#include "../../include/contra.h"
+#include "../index.h"
+
+
 #define CONTRA_PATH__BUFFER_LEN      32
 #define CONTRA_PATH__DIRECTION_LEFT  1
 #define CONTRA_PATH__DIRECTION_RIGHT 2

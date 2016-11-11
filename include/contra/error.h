@@ -11,13 +11,11 @@
 
 
 /** Errors */
-#define ERR_START -101
-#define ERR(x) CONTRA_ERR_##x
 typedef enum {
-    ERR(START) = ERR_START,
-
-    ERR(MALLOC),
-    ERR(BAD_ARGS),
+    /* General errors */
+    CONTRA_ERR = -1000,
+    CONTRA_ERR_MALLOC,
+    CONTRA_ERR_BAD_ARGS,
 } contra_error_code;
 
 #endif

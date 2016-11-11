@@ -19,6 +19,7 @@ install(TARGETS contra LIBRARY DESTINATION lib)
 install(FILES include/contra.h DESTINATION include)
 install(DIRECTORY include/contra DESTINATION include)
 
+if(NOT (${CMAKE_BUILD_TYPE} MATCHES Release))
 # test executable
 add_custom_target(test-pre
     COMMAND mkdir -p ${bin_dir}/inline-tests
@@ -47,3 +48,4 @@ add_custom_target(run-tests
     COMMAND TEST_DIR=${root_dir}/test ${root_dir}/test/run.sh
     WORKING_DIR ${root_dir})
 add_dependencies(run-tests test-contra)
+endif()

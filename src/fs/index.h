@@ -1,37 +1,19 @@
-#ifndef FS_H
-#define FS_H 1
-
-
 /**
- * fs.h
+ * Contra's FS mini-library.
  *
- * copyright 2013 - joseph werle <joseph.werle@gmail.com>
+ * The MIT License (MIT)
+ * Copyright (c) 2016 GochoMugo <mugo@forfuture.co.ke>
+ * Copyright (c) 2016 Forfuture, LLC <we@forfuture.co.ke>
  */
 
 
-#include <stdio.h>
-#include <sys/stat.h>
+#ifndef _CONTRA_src_fs_h_
+#define _CONTRA_src_fs_h 1
 
-#ifdef _WIN32
-#define FS_OPEN_READ "rb"
-#define FS_OPEN_WRITE "wb"
-#define FS_OPEN_READWRITE "rwb"
-#else
-#define FS_OPEN_READ "r"
-#define FS_OPEN_WRITE "w"
-#define FS_OPEN_READWRITE "rw"
-#endif
+
 
 typedef struct stat fs_stats;
 
-
-
-/**
- * Prints the last error to stderr
- */
-
-void
-fs_error (const char *prefix);
 
 
 /**

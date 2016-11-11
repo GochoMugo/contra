@@ -1,9 +1,15 @@
-
 /**
- * fs.c
+ * Contra's FS mini-library.
  *
- * copyright 2013 - joseph werle <joseph.werle@gmail.com>
+ * The MIT License (MIT)
+ * Copyright (c) 2016 GochoMugo <mugo@forfuture.co.ke>
+ * Copyright (c) 2016 Forfuture, LLC <we@forfuture.co.ke>
  */
+
+
+#include "../../include/contra.h"
+#include "index.h"
+
 
 #define _POSIX_C_SOURCE 200809L
 #include <stdlib.h>
@@ -15,14 +21,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include "fs.h"
-
-void
-fs_error (const char *prefix) {
-  char fmt[256];
-  sprintf(fmt, "fs: %s: error", prefix);
-  perror(fmt);
-}
 
 
 FILE *

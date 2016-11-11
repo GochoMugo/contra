@@ -15,6 +15,9 @@ set(src_lib
     deps/sds/sds.c
     src/path/index.c)
 add_library(contra SHARED ${src_lib})
+install(TARGETS contra LIBRARY DESTINATION lib)
+install(FILES include/contra.h DESTINATION include)
+install(DIRECTORY include/contra DESTINATION include)
 
 # test executable
 add_custom_target(test-pre

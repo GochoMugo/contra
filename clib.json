@@ -1,0 +1,19 @@
+{
+  "name": "contra",
+  "version": "0.0.2",
+  "description": "Standard Library",
+  "license": "MIT",
+  "repo": "gochomugo/contra",
+  "src": [
+    "src/assert.h",
+    "src/base.h",
+    "src/contra.h",
+    "src/error.h",
+    "src/index.h",
+    "src/is.h",
+    "src/math.h",
+    "src/path.c",
+    "src/path.h",
+    "src/types.h"
+  ]
+}

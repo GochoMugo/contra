@@ -46,6 +46,9 @@ void tests_contra_is_int_greater_than_or_equal(void **state) {
 void tests_contra_is_str_equal(void **state) {
     assert_ok(contra_is_str_equal("", ""));
     assert_ok(contra_is_str_equal("abc\tdef", "abc\tdef"));
+    assert_ok(!contra_is_str_equal("", NULL));
+    assert_ok(!contra_is_str_equal(NULL, ""));
+    assert_ok(!contra_is_str_equal(NULL, NULL));
 }
 
 

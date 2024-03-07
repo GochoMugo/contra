@@ -5,15 +5,14 @@ project(contra)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --std=c99 -Wall -pedantic")
 set(root_dir ${CMAKE_CURRENT_SOURCE_DIR})
 set(bin_dir ${CMAKE_CURRENT_BINARY_DIR})
-set(deps )
-set(test_deps contra ${deps} cmocka)
+set(test_deps contra cmocka)
 set(test_headers_dir ${bin_dir}/test-headers)
 include_directories(${root_dir}/include ${bin_dir} deps)
 
 # library
 set(src_lib
-    deps/sds/sds.c
-    src/path/index.c)
+    src/path.c
+)
 add_library(contra SHARED ${src_lib})
 install(TARGETS contra LIBRARY DESTINATION lib)
 install(FILES include/contra.h DESTINATION include)
@@ -26,17 +25,19 @@ add_custom_target(test-pre
     COMMAND mkdir -p ${bin_dir}/test-headers)
 # list inline-tests as by-products of this target
 add_custom_target(test-inline
-    COMMAND ROOT_DIR=${root_dir} python ${root_dir}/script/gen-inline-tests.py ${root_dir}/src/**/*.c
+    COMMAND ROOT_DIR=${root_dir} python ${root_dir}/script/gen-inline-tests.py ${root_dir}/src/*.c
     WORKING_DIRECTORY ${bin_dir}/inline-tests
-    BYPRODUCTS ${bin_dir}/inline-tests/src_path_index.c)
+    BYPRODUCTS ${bin_dir}/inline-tests/src_path.c)
 add_custom_target(test-hdrs
     COMMAND python ${root_dir}/script/gen-test-headers.py --input ${root_dir}/test/*.c ${bin_dir}/inline-tests/*.c --main ${root_dir}/test/main.h.in --namespace contra
     WORKING_DIRECTORY ${bin_dir}/test-headers)
 set(test_src_exe
     test/is.c
     test/main.c
-    ${bin_dir}/inline-tests/src_path_index.c)
+    ${bin_dir}/inline-tests/src_path.c)
 add_executable(test-contra EXCLUDE_FROM_ALL ${test_src_exe})
+target_include_directories(test-contra PRIVATE /usr/local/include) # TODO: /usr/local/
+target_link_directories(test-contra PRIVATE /usr/local/lib) # TODO: /usr/local/
 target_link_libraries(test-contra ${test_deps})
 add_dependencies(test-contra contra test-hdrs)
 add_dependencies(test-inline test-pre)

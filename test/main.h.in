@@ -11,7 +11,7 @@
 
 #define assert_ok(expr) assert_int_equal(0 <= expr, 1)
 
-#include <contra.h>
+#include "../src/contra.h"
 {test_header_includes_str}
 
 

@@ -3,7 +3,6 @@
  *
  * The MIT License (MIT)
  * Copyright (c) 2016 GochoMugo <mugo@forfuture.co.ke>
- * Copyright (c) 2016 Forfuture, LLC <we@forfuture.co.ke>
  */
 
 #ifndef _CONTRA_assert_h_
@@ -11,14 +10,14 @@
 
 
 #ifndef NDEBUG
-#define contra_assert__make(expression, message, args...) \
+#define contra_assert__make(expression, message, ...) \
     if (!expression) { \
         fprintf(stderr, "Assertion failed at %s:%d\n", __FILE__, __LINE__); \
-        fprintf(stderr, message, ##args); \
+        fprintf(stderr, message, __VA_ARGS__); \
         abort(); \
     }
 #else
-#define contra_assert__make(expression, message, args...)
+#define contra_assert__make(expression, message, ...)
 #endif
 
 

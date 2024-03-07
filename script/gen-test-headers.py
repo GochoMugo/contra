@@ -23,7 +23,7 @@ def generate_header_files(src_filenames, namespace=None, exclude=[]):
         try:
             generate_header_file(file_id, src_filepath, dest_filepath)
             header_filenames.append(dest_filepath)
-        except Exception, e:
+        except Exception as e:
             print("failed to generate test header file:")
             print("  source: %s" % src_filepath)
             print("  dest:   %s" % dest_filepath)
@@ -67,8 +67,8 @@ def generate_header_file(file_id, src_filepath, dest_filepath):
             "\n"
             "#endif")
         dest_file.write(output.format(file_id=file_id, lq="{", rq="}",
-            test_declarations_str=string.join(test_declarations, "\n"),
-            test_invocations_str=string.join(test_invocations, "\n")))
+            test_declarations_str="\n".join(test_declarations),
+            test_invocations_str="\n".join(test_invocations)))
 
 
 def generate_main_header_file(template_filepath):
@@ -77,14 +77,17 @@ def generate_main_header_file(template_filepath):
         "#include <stddef.h>",
         "#include <stdio.h>",
         "#include <setjmp.h>",
-        "#include <cmocka.h>",
+        "#include <stdint.h>",
+        "#include <string.h>",
+        "#include <stdlib.h>",
+        "#include \"../../deps/cmocka/include/cmocka.h\"",
     ]
 
     with open(template_filepath, "r") as template_file:
         for header_filename in header_filenames:
             header_includes.append("#include \"" + header_filename + "\"")
         output = template_file.read().format(
-                test_header_includes_str=string.join(header_includes, "\n"))
+                test_header_includes_str="\n".join(header_includes))
         with open("main.h", "w") as dest_file:
             dest_file.write(output)
 

@@ -3,7 +3,6 @@
  *
  * The MIT License (MIT)
  * Copyright (c) 2016 GochoMugo <mugo@forfuture.co.ke>
- * Copyright (c) 2016 Forfuture, LLC <we@forfuture.co.ke>
  */
 
 #ifndef _CONTRA_h_
@@ -14,12 +13,11 @@
 #define CONTRA_VERSION_MINOR 0
 #define CONTRA_VERSION_PATCH 0
 
-#include "contra/base.h"
-#include "contra/types.h"
-#include "contra/error.h"
-#include "contra/assert.h"
-#include "contra/is.h"
-#include "contra/math.h"
-#include "contra/path.h"
+#include "base.h"
+#include "error.h"
+#include "assert.h"
+#include "is.h"
+#include "math.h"
+#include "path.h"
 
 #endif

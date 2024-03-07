@@ -3,7 +3,6 @@
  *
  * The MIT License (MIT)
  * Copyright (c) 2016 GochoMugo <mugo@forfuture.co.ke>
- * Copyright (c) 2016 Forfuture, LLC <we@forfuture.co.ke>
  */
 
 #ifndef _CONTRA_base_h_
@@ -39,20 +38,32 @@
  * If 'result' is less than zero, set the 'ret_code' to 'result' and
  * jump to error-handling.
  */
+#ifdef contra_error_set_cb
+#define return_err(result) if (0 > result) { contra_error_set_cb(result); ret_code = result; goto on_error; }
+#else
 #define return_err(result) if (0 > result) { ret_code = result; goto on_error; }
+#endif
 
 
 /**
  * If 'result' is less than zero, set the 'ret_code' to 'custom_err' and
  * jump to error-handling.
  */
+#ifdef contra_error_set_cb
+#define return_err_ext(result, custom_err) if (0 > result) { contra_error_set_cb(custom_err); ret_code = custom_err; goto on_error; }
+#else
 #define return_err_ext(result, custom_err) if (0 > result) { ret_code = custom_err; goto on_error; }
+#endif
 
 
 /**
  * Set 'ret_code' to 'custom_err' and jump to error-handling.
  */
+#ifdef contra_error_set_cb
+#define return_err_now(custom_err) { contra_error_set_cb(custom_err); ret_code = custom_err; goto on_error; }
+#else
 #define return_err_now(custom_err) { ret_code = custom_err; goto on_error; }
+#endif
 
 
 #endif

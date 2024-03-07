@@ -1,9 +1,7 @@
 import re
-import subprocess
-import sys
 
 
-def parse(func_raw, test_raw, line_num, test_num):
+def parse(dest_filename, dest_file, func_raw, test_raw, line_num):
     # 'func_raw' would be in the form: 'contra_funcname(int **out)'
     # we are removing the argument list so as to remain with the function
     # name
@@ -56,7 +54,7 @@ def parse(func_raw, test_raw, line_num, test_num):
         raise Exception("could not parse test definition")
 
     # define the function name and arguments list, etc.
-    output = ("\nvoid tests_contra_inline_L%s_%s(void **state) {\n" % (line_num, test_num))
+    output = ("\nvoid tests_contra_inline_%s_L%s(void **state) {\n" % (dest_filename.replace(".c", ""), line_num))
 
     # if the type of the out value is an 'int', declare an 'int' variable
     # otherwise, declare a pointer of type 'type'
@@ -67,22 +65,20 @@ def parse(func_raw, test_raw, line_num, test_num):
 
     # invoking the function and asserting here
     output += ("\tassert_int_equal(%s(&out, %s), %s);\n" % (func_name, args, ret))
+    # output += "\tprintf(\"DID 1 \");\n";
 
     # asserting the return value
     if out_type == "int": output += ("\tassert_int_equal(out, %s);\n" % out)
-    elif out_type == "char": output += ("\tassert_string_equal(out, %s);\n" % eval(out))
+    elif out_type == "char": output += ("\tif (NULL != %s) assert_string_equal(out, %s);\n" % (out, out))
+    # output += "\tprintf(\"DID 2 \");\n";
 
     # if the out type was an integer, we need not do anythin
     # however, if it was a pointer, we need to free it
     if out_type == "int": pass
     else: output += "\tfree(out);\n"
+    # output += "\tprintf(\"DID 3 \");\n";
 
     # closing the function/output
     output += "}\n"
 
     return output
-
-
-# This performs evaluations using a bash terminal
-def eval(string):
-    return "\"%s\"" % subprocess.check_output("echo %s" % string, shell=True, executable='/bin/bash').strip()

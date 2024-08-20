@@ -13,11 +13,11 @@
 #define CONTRA_VERSION_MINOR 0
 #define CONTRA_VERSION_PATCH 0
 
-#include "base.h"
-#include "error.h"
-#include "assert.h"
-#include "is.h"
-#include "math.h"
-#include "path.h"
+#include "contra/base.h"
+#include "contra/error.h"
+#include "contra/assert.h"
+#include "contra/is.h"
+#include "contra/math.h"
+#include "contra/path.h"
 
 #endif

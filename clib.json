@@ -5,14 +5,14 @@
   "license": "MIT",
   "repo": "gochomugo/contra",
   "src": [
-    "src/assert.h",
-    "src/base.h",
-    "src/contra.h",
-    "src/error.h",
+    "include/contra.h",
+    "include/contra/assert.h",
+    "include/contra/base.h",
+    "include/contra/error.h",
+    "include/contra/is.h",
+    "include/contra/math.h",
+    "include/contra/path.h",
     "src/index.h",
-    "src/is.h",
-    "src/math.h",
-    "src/path.c",
-    "src/path.h"
+    "src/path.c"
   ]
 }

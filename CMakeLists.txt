@@ -11,6 +11,7 @@ include_directories(${root_dir}/include ${bin_dir} deps)
 
 # library
 set(src_lib
+    src/http.c
     src/path.c
 )
 add_library(contra SHARED ${src_lib})

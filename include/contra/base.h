@@ -31,7 +31,7 @@
 /**
  * Set 'ret_code' to 0 and jump to cleanup.
  */
-#define return_ok(ret_code) { ret_code = 0; goto cleanup; }
+#define return_ok(result) { ret_code = result; goto cleanup; }
 
 
 /**

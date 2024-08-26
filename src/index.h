@@ -9,6 +9,7 @@
 #define _CONTRA_index_h_ 1
 
 #include <assert.h>
+#include <contra.h>
 #include <curl/curl.h>
 #include <errno.h>
 #include <stdarg.h>
@@ -17,8 +18,6 @@
 #include <string.h>
 #include <strings.h>
 #include <unistd.h>
-
-#include "contra.h"
 
 #define ERR(x) CONTRA_ERR_##x
 

@@ -8,7 +8,6 @@
 #ifndef _CONTRA_math_h_
 #define _CONTRA_math_h_ 1
 
-
 /**
  * Return the minimum of the two integers.
  *
@@ -18,7 +17,6 @@
  */
 #define contra_math_min(a, b) (a < b ? a : b)
 
-
 /**
  * Return the maximum of the two integers.
  *
@@ -27,6 +25,5 @@
  * @return true/false
  */
 #define contra_math_max(a, b) (a < b ? b : a)
-
 
 #endif

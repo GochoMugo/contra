@@ -41,7 +41,7 @@
 #define contra_assert_int_equal(a, b) \
         contra_assert__make(contra_is_int_equal(a, b), \
                 "Expected: %d == %d\n", a, b)
-#define contra_assert_int_eq(a, b) assert_int_equal(a, b)
+#define contra_assert_int_eq(a, b) contra_assert_int_equal(a, b)
 
 
 /**

@@ -36,6 +36,9 @@ cmake ..
 # Build library.
 make
 
+# Install library (usually under /usr/local).
+make install
+
 # Run tests.
 make run-tests
 ```

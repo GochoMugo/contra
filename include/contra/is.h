@@ -17,7 +17,7 @@
  * @return true/false
  */
 #define contra_is_int_equal(a, b) (a == b)
-#define contra_is_int_eq(a, b) contra_is_int_equal(a, b)
+#define contra_is_int_eq contra_is_int_equal
 
 /**
  * Return true if integer 'a' is less than integer 'b'.
@@ -28,7 +28,7 @@
  * @return true/false
  */
 #define contra_is_int_less_than(a, b) (a < b)
-#define contra_is_int_lt(a, b) contra_is_int_less_than(a, b)
+#define contra_is_int_lt contra_is_int_less_than
 
 /**
  * Return true if integer 'a' is less than or equal to integer 'b'.
@@ -39,7 +39,7 @@
  * @return true/false
  */
 #define contra_is_int_less_than_or_equal(a, b) (a <= b)
-#define contra_is_int_lte(a, b) contra_is_int_less_than_or_equal(a, b)
+#define contra_is_int_lte contra_is_int_less_than_or_equal
 
 /**
  * Return true if integer 'a' is greater than integer 'b'.
@@ -50,7 +50,7 @@
  * @return true/false
  */
 #define contra_is_int_greater_than(a, b) (a > b)
-#define contra_is_int_gt(a, b) contra_is_int_greater_than(a, b)
+#define contra_is_int_gt contra_is_int_greater_than
 
 /**
  * Return true if integer 'a' is greater than or equal to integer 'b'.
@@ -61,7 +61,7 @@
  * @return true/false
  */
 #define contra_is_int_greater_than_or_equal(a, b) (a >= b)
-#define contra_is_int_gte(a, b) contra_is_int_greater_than_or_equal(a, b)
+#define contra_is_int_gte contra_is_int_greater_than_or_equal
 
 /**
  * Return true if string 'a' is equal to string 'b'.
@@ -72,16 +72,16 @@
  * @return true/false
  */
 #define contra_is_str_equal(a, b) (a != NULL && b != NULL && 0 == strcmp(a, b))
-#define contra_is_str_eq(a, b) contra_is_str_equal(a, b)
+#define contra_is_str_eq contra_is_str_equal
 
 /**
- * Return true if string 'str' is empty.
+ * Return true if string 'str' is empty or null.
  * Otherwise, return false.
  *
  * @param  str string
  * @return true/false
  */
-#define contra_is_str_empty(str) (0 == strlen(str))
+#define contra_is_str_empty(str) (NULL == str || 0 == strlen(str))
 
 /**
  * Return true if 'ptr' is NULL.

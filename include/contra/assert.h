@@ -26,7 +26,8 @@
  * @param  expression scalar
  */
 #define contra_assert_ok(expression)                                           \
-  contra_assert__make((expression), "Expected the expression to be truthy\n")
+  contra_assert__make((expression != 0),                                       \
+                      "Expected the expression to be truthy\n", NULL)
 
 /**
  * Assert that the integer 'a' is equal to integer 'b'.

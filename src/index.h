@@ -19,6 +19,4 @@
 #include <strings.h>
 #include <unistd.h>
 
-#define ERR(x) CONTRA_ERR_##x
-
 #endif

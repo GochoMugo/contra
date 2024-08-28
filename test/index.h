@@ -9,10 +9,12 @@
 #ifndef _CONTRA_tests_h_
 #define _CONTRA_tests_h_ 1
 
-#define assert_ok(expr) assert_int_equal(0 <= expr, 1)
+#include <stdarg.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <setjmp.h>
+#include <cmocka.h>
 
-#include "../src/contra.h"
-{test_header_includes_str}
-
+#include "../src/index.h"
 
 #endif

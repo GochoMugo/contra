@@ -1,6 +1,6 @@
 [submodule "deps/cmocka"]
 	path = deps/cmocka
-	url = https://github.com/clibs/cmocka.git
+	url = https://gitlab.com/cmocka/cmocka.git
 [submodule "deps/crun"]
 	path = deps/crun
 	url = https://github.com/GochoMugo/crun.git

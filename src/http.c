@@ -61,8 +61,11 @@ int contra_http_post(contra_http_response **out, const char *url,
   curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
   curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, res->error_message);
   curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-  curl_easy_setopt(curl, CURLOPT_POSTFIELDS, body);
-  curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE_LARGE, (curl_off_t)strlen(body));
+  if (NULL != body) {
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, body);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE_LARGE,
+                     (curl_off_t)strlen(body));
+  }
   curl_easy_setopt(curl, CURLOPT_URL, url);
   curl_easy_setopt(curl, CURLOPT_USERAGENT, "contra");
   curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)buffer);
@@ -77,16 +80,14 @@ int contra_http_post(contra_http_response **out, const char *url,
   res->body = buffer->data;
   curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &(res->status_code));
 
-_on_error
-  if (NULL != buffer) {
+  _on_error if (NULL != buffer) {
     if (NULL != buffer->data && (NULL == res || NULL == res->body))
       free(buffer->data);
     free(buffer);
   }
   if (NULL != res)
     contra_http_response_free(&res);
-_cleanup 
-  if (NULL != curl) curl_easy_cleanup(curl);
+  _cleanup if (NULL != curl) curl_easy_cleanup(curl);
   if (NULL != headers)
     curl_slist_free_all(headers);
   return ret_code;

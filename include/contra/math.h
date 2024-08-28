@@ -9,15 +9,6 @@
 #define _CONTRA_math_h_ 1
 
 /**
- * Return the minimum of the two integers.
- *
- * @param  a int
- * @param  b int
- * @return true/false
- */
-#define contra_math_min(a, b) (a < b ? a : b)
-
-/**
  * Return the maximum of the two integers.
  *
  * @param  a int
@@ -25,5 +16,14 @@
  * @return true/false
  */
 #define contra_math_max(a, b) (a < b ? b : a)
+
+/**
+ * Return the minimum of the two integers.
+ *
+ * @param  a int
+ * @param  b int
+ * @return true/false
+ */
+#define contra_math_min(a, b) (a < b ? a : b)
 
 #endif

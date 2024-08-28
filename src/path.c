@@ -34,7 +34,7 @@ int contra_path__rtrim(char **out, const char *path, int needle) {
   trimmed_path_len = rindex + 1;
   trimmed_path = (char *)malloc(trimmed_path_len + 1);
   if (contra_is_null(trimmed_path)) {
-    return_err_now(ERR(MALLOC));
+    return_err_now(CONTRA_ERR_MALLOC);
   }
 
   strncpy(trimmed_path, path, trimmed_path_len);
@@ -47,27 +47,6 @@ int contra_path__rtrim(char **out, const char *path, int needle) {
 }
 
 /**
- * #tests
- * "/home/gochomugo", "projects"  => "/home/gochomugo/projects"
- * "/home/gochomugo", "/projects" => "/home/gochomugo/projects"
- * "/home/gochomugo", "/"         => "/home/gochomugo/"
- * "/home/gochomugo/", "/"        => "/home/gochomugo/"
- * "/home/gochomugo", "."         => "/home/gochomugo/."
- * "/home/gochomugo", ".."        => "/home/gochomugo/.."
- * "gochomugo", "projects"        => "gochomugo/projects"
- * "gochomugo", "/projects"       => "gochomugo/projects"
- * "/home/gochomugo", NULL        => "/home/gochomugo"
- * "/home/gochomugo", ""          => "/home/gochomugo"
- * NULL, "projects"               => "projects"
- * NULL, "/projects"              => "/projects"
- * "", "projects"                 => "projects"
- * "", "/projects"                => "/projects"
- * "", NULL                       #> (CONTRA_ERR_BAD_ARGS)
- * "", ""                         #> (CONTRA_ERR_BAD_ARGS)
- * NULL, NULL                     #> (CONTRA_ERR_BAD_ARGS)
- * NULL, ""                       #> (CONTRA_ERR_BAD_ARGS)
- * #endtests
- *
  * #pseudocode
  * 1. If 'segment1' is falsey, but not 'segment2', return 'segment2'
  * 2. If 'segment2' is falsey, but not 'segment1', return 'segment1'
@@ -89,14 +68,13 @@ int contra_path_join(char **out, const char *segment1, const char *segment2) {
   segment2_falsey = contra_path__falsey(segment2);
 
   if (segment1_falsey || segment2_falsey) {
-    if (!segment1_falsey)
-      path = strdup(segment1);
-    else if (!segment2_falsey)
-      path = strdup(segment2);
-    else
-      return_err_now(ERR(BAD_ARGS));
-    if (contra_is_null(path))
-      return_err_now(ERR(MALLOC));
+    if (!segment1_falsey) {
+      return_err(contra_str_copy(&path, segment1));
+    } else if (!segment2_falsey) {
+      return_err(contra_str_copy(&path, segment2));
+    } else {
+      return_err_now(CONTRA_ERR_BAD_ARGS);
+    }
     *out = path;
     return_ok(ret_code);
   }
@@ -111,14 +89,12 @@ int contra_path_join(char **out, const char *segment1, const char *segment2) {
 
   ret_code = asprintf(&path, "%s%s%s", segment1_trimmed,
                       (segment2_slashed ? "" : "/"), segment2);
-  return_err_ext(ret_code, ERR(MALLOC));
+  return_err_ext(ret_code, CONTRA_ERR_MALLOC);
 
   *out = path;
   ret_code = 0;
 
-_on_error 
-  if (NULL != path) free(path);
-_cleanup 
-  if (NULL != segment1_trimmed) free(segment1_trimmed);
+  _on_error if (NULL != path) free(path);
+  _cleanup if (NULL != segment1_trimmed) free(segment1_trimmed);
   return ret_code;
 }

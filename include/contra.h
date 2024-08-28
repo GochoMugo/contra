@@ -20,5 +20,6 @@
 #include "contra/is.h"
 #include "contra/math.h"
 #include "contra/path.h"
+#include "contra/string.h"
 
 #endif

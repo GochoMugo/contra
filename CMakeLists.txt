@@ -23,37 +23,55 @@ install(DIRECTORY include/contra DESTINATION include)
 if(NOT (${CMAKE_BUILD_TYPE} MATCHES Release))
     link_libraries(cmocka contra)
 
-    # build cmocka
+    # cmocka
     include_directories(deps/cmocka/include)
     link_directories(deps/cmocka/build/src)
-    add_custom_target(build-cmocka
+    add_custom_target(cmocka
         COMMAND mkdir -p build && cd build && cmake .. && make
         WORKING_DIRECTORY ${root_dir}/deps/cmocka
     )
 
+    # task: tests.assert
+    add_custom_target(tests.assert COMMAND ${root_dir}/test/assert/assert.test.sh)
+
+    # task: tests.http
     add_executable(http.test EXCLUDE_FROM_ALL test/http.test.c)
-    add_dependencies(http.test build-cmocka)
+    add_dependencies(http.test cmocka)
+    add_custom_target(tests.http COMMAND ${bin_dir}/http.test)
+    add_dependencies(tests.http http.test)
 
+    # task: tests.is
     add_executable(is.test EXCLUDE_FROM_ALL test/is.test.c)
-    add_dependencies(is.test build-cmocka)
+    add_dependencies(is.test cmocka)
+    add_custom_target(tests.is COMMAND ${bin_dir}/is.test)
+    add_dependencies(tests.is is.test)
 
+    # task: tests.math
     add_executable(math.test EXCLUDE_FROM_ALL test/math.test.c)
-    add_dependencies(math.test build-cmocka)
+    add_dependencies(math.test cmocka)
+    add_custom_target(tests.math COMMAND ${bin_dir}/math.test)
+    add_dependencies(tests.math math.test)
 
+    # task: tests.path
     add_executable(path.test EXCLUDE_FROM_ALL test/path.test.c)
-    add_dependencies(path.test build-cmocka)
+    add_dependencies(path.test cmocka)
+    add_custom_target(tests.path COMMAND ${bin_dir}/path.test)
+    add_dependencies(tests.path path.test)
 
+    # task: tests.string
     add_executable(string.test EXCLUDE_FROM_ALL test/string.test.c)
-    add_dependencies(string.test build-cmocka)
+    add_dependencies(string.test cmocka)
+    add_custom_target(tests.string COMMAND ${bin_dir}/string.test)
+    add_dependencies(tests.string string.test)
 
-    # task: running tests
-    add_custom_target(tests
-        COMMAND ${root_dir}/test/assert/assert.test.sh
-        COMMAND ${bin_dir}/http.test
-        COMMAND ${bin_dir}/is.test
-        COMMAND ${bin_dir}/math.test
-        COMMAND ${bin_dir}/path.test
-        COMMAND ${bin_dir}/string.test
-        WORKING_DIR ${root_dir})
-    add_dependencies(tests http.test is.test math.test path.test string.test)
+    # task: tests
+    add_custom_target(tests)
+    add_dependencies(tests
+        tests.assert
+        tests.http
+        tests.is
+        tests.math
+        tests.path
+        tests.string
+    )
 endif()

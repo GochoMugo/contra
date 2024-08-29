@@ -39,8 +39,16 @@ make
 # Install library (usually under /usr/local).
 make install
 
-# Run tests.
+# Run all tests.
 make tests
+
+# Run subset of tests
+make tests.assert
+make tests.http
+make tests.is
+make tests.math
+make tests.path
+make tests.string
 ```
 
 

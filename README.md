@@ -40,7 +40,7 @@ make
 make install
 
 # Run tests.
-make run-tests
+make tests
 ```
 
 

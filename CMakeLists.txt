@@ -47,7 +47,7 @@ if(NOT (${CMAKE_BUILD_TYPE} MATCHES Release))
     add_dependencies(string.test build-cmocka)
 
     # task: running tests
-    add_custom_target(run-tests
+    add_custom_target(tests
         COMMAND ${root_dir}/test/assert/assert.test.sh
         COMMAND ${bin_dir}/http.test
         COMMAND ${bin_dir}/is.test
@@ -55,5 +55,5 @@ if(NOT (${CMAKE_BUILD_TYPE} MATCHES Release))
         COMMAND ${bin_dir}/path.test
         COMMAND ${bin_dir}/string.test
         WORKING_DIR ${root_dir})
-    add_dependencies(run-tests http.test is.test math.test path.test string.test)
+    add_dependencies(tests http.test is.test math.test path.test string.test)
 endif()

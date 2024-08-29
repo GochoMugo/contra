@@ -31,6 +31,8 @@ void tests_contra_http_post(void **state) {
   // HTTP (network) error.
   int ret_code = contra_http_post(&out, "https://unknown.gocho.live", NULL);
   assert_int_equal(ret_code, CONTRA_ERR_HTTP);
+  assert_true(out->error_code > 0);
+  assert_contains(out->error_message, "Could not resolve host");
   out = NULL;
 }
 

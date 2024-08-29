@@ -85,7 +85,7 @@ int contra_http_post(contra_http_response **out, const char *url,
       free(buffer->data);
     free(buffer);
   }
-  if (NULL != res)
+  if (NULL != res && ret_code != CONTRA_ERR_HTTP)
     contra_http_response_free(&res);
   _cleanup if (NULL != curl) curl_easy_cleanup(curl);
   if (NULL != headers)

@@ -42,8 +42,11 @@ int contra_path__rtrim(char **out, const char *path, int needle) {
 
   *out = trimmed_path;
 
-  _on_error if (NULL != trimmed_path) free(trimmed_path);
-  _cleanup return ret_code;
+_on_error:
+  if (NULL != trimmed_path)
+    free(trimmed_path);
+_cleanup:
+  return ret_code;
 }
 
 /**
@@ -94,7 +97,11 @@ int contra_path_join(char **out, const char *segment1, const char *segment2) {
   *out = path;
   ret_code = 0;
 
-  _on_error if (NULL != path) free(path);
-  _cleanup if (NULL != segment1_trimmed) free(segment1_trimmed);
+_on_error:
+  if (NULL != path)
+    free(path);
+_cleanup:
+  if (NULL != segment1_trimmed)
+    free(segment1_trimmed);
   return ret_code;
 }

@@ -80,14 +80,17 @@ int contra_http_post(contra_http_response **out, const char *url,
   res->body = buffer->data;
   curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &(res->status_code));
 
-  _on_error if (NULL != buffer) {
+_on_error:
+  if (NULL != buffer) {
     if (NULL != buffer->data && (NULL == res || NULL == res->body))
       free(buffer->data);
     free(buffer);
   }
   if (NULL != res && ret_code != CONTRA_ERR_HTTP)
     contra_http_response_free(&res);
-  _cleanup if (NULL != curl) curl_easy_cleanup(curl);
+_cleanup:
+  if (NULL != curl)
+    curl_easy_cleanup(curl);
   if (NULL != headers)
     curl_slist_free_all(headers);
   return ret_code;

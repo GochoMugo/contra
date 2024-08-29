@@ -19,14 +19,14 @@
  */
 #define _on_error                                                              \
   goto cleanup;                                                                \
-  on_error:
+  on_error
 
 /**
  * Defines clean-up section of the function.
  */
 #define _cleanup                                                               \
   goto cleanup;                                                                \
-  cleanup:
+  cleanup
 
 /**
  * Set 'ret_code' to 0 and jump to cleanup.

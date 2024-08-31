@@ -7,6 +7,12 @@ testdir="$(dirname "${BASH_SOURCE[0]}")"
 rootdir="$(dirname "${testdir}")"
 rootdir="$(dirname "${rootdir}")"
 
+if [[ "${OSTYPE}" == darwin* ]] ; then
+    null="0x0"
+else
+    null="\(nil\)"
+fi
+
 tests=(
     "ok(null)|Expected the expression to be truthy"
     "ok(0)|Expected the expression to be truthy"
@@ -21,7 +27,7 @@ tests=(
     'str_empty(abc)|Expected: abc == \"\"'
     "str_not_empty('')|Expected:  != \"\""
     "null('')|Expected: .+ == NULL"
-    "not_null(NULL)|Expected: \(nil\) != NULL"
+    "not_null(NULL)|Expected: ${null} != NULL"
 )
 
 # exit code

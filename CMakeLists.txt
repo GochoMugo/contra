@@ -12,7 +12,8 @@ set(src_lib
     src/path.c
     src/string.c
 )
-include_directories(${root_dir}/include)
+include_directories(${root_dir}/include $ENV{HOME}/.local/include)
+link_directories($ENV{HOME}/.local/lib)
 link_libraries(curl)
 add_library(contra SHARED ${src_lib})
 add_library(contra_static STATIC ${src_lib})

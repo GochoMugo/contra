@@ -9,8 +9,19 @@
 #define _CONTRA_base_h_ 1
 
 /**
- * Define 'true' and 'false'.
+ * Temporary buffers for return codes
+ * and custom error codes.
+ *
+ * Using these variables avoid any macro arguments
+ * from being substituted more than once.
  */
+static int __contra_rc = 0;
+static int __contra_ce = 0;
+
+/**
+ * Define booleans; 'true' and 'false'.
+ */
+#define bool unsigned int
 #define true 1
 #define false 0
 
@@ -29,11 +40,12 @@
   cleanup
 
 /**
- * Set 'ret_code' to 0 and jump to cleanup.
+ * Set 'ret_code' to 'result' and jump to cleanup.
  */
 #define return_ok(result)                                                      \
   {                                                                            \
-    ret_code = result;                                                         \
+    __contra_rc = result;                                                      \
+    ret_code = __contra_rc;                                                    \
     goto cleanup;                                                              \
   }
 
@@ -43,15 +55,17 @@
  */
 #ifdef contra_error_set_cb
 #define return_err(result)                                                     \
-  if (0 > result) {                                                            \
-    contra_error_set_cb(result);                                               \
-    ret_code = result;                                                         \
+  __contra_rc = result;                                                        \
+  if (0 > __contra_rc) {                                                       \
+    contra_error_set_cb(__contra_rc);                                          \
+    ret_code = __contra_rc;                                                    \
     goto on_error;                                                             \
   }
 #else
 #define return_err(result)                                                     \
-  if (0 > result) {                                                            \
-    ret_code = result;                                                         \
+  __contra_rc = result;                                                        \
+  if (0 > __contra_rc) {                                                       \
+    ret_code = __contra_rc;                                                    \
     goto on_error;                                                             \
   }
 #endif
@@ -62,15 +76,19 @@
  */
 #ifdef contra_error_set_cb
 #define return_err_ext(result, custom_err)                                     \
-  if (0 > result) {                                                            \
-    contra_error_set_cb(custom_err);                                           \
-    ret_code = custom_err;                                                     \
+  __contra_rc = result;                                                        \
+  __contra_ce = custom_err;                                                    \
+  if (0 > __contra_rc) {                                                       \
+    contra_error_set_cb(__contra_ce);                                          \
+    ret_code = __contra_ce;                                                    \
     goto on_error;                                                             \
   }
 #else
 #define return_err_ext(result, custom_err)                                     \
-  if (0 > result) {                                                            \
-    ret_code = custom_err;                                                     \
+  __contra_rc = result;                                                        \
+  __contra_ce = custom_err;                                                    \
+  if (0 > __contra_rc) {                                                       \
+    ret_code = __contra_ce;                                                    \
     goto on_error;                                                             \
   }
 #endif
@@ -81,14 +99,16 @@
 #ifdef contra_error_set_cb
 #define return_err_now(custom_err)                                             \
   {                                                                            \
-    contra_error_set_cb(custom_err);                                           \
-    ret_code = custom_err;                                                     \
+    __contra_ce = custom_err;                                                  \
+    contra_error_set_cb(__contra_ce);                                          \
+    ret_code = __contra_ce;                                                    \
     goto on_error;                                                             \
   }
 #else
 #define return_err_now(custom_err)                                             \
   {                                                                            \
-    ret_code = custom_err;                                                     \
+    __contra_ce = custom_err;                                                  \
+    ret_code = __contra_ce;                                                    \
     goto on_error;                                                             \
   }
 #endif

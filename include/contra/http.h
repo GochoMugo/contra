@@ -17,6 +17,15 @@ typedef struct contra_http_response {
 } contra_http_response;
 
 /**
+ * Sends a GET request to the specified URL.
+ *
+ * @param out Response
+ * @param url URL
+ * @return 0 or error code
+ */
+int contra_http_get(contra_http_response **out, const char * url);
+
+/**
  * Sends a POST request to the specified URL.
  *
  * @param  out Response

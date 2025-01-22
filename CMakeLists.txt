@@ -11,14 +11,16 @@ set(src_lib
     src/http.c
     src/path.c
     src/string.c
+    deps/parson/parson.c
 )
-include_directories(${root_dir}/include $ENV{HOME}/.local/include)
+include_directories(${root_dir}/include ${root_dir}/deps $ENV{HOME}/.local/include)
 link_directories($ENV{HOME}/.local/lib)
 link_libraries(curl)
 add_library(contra SHARED ${src_lib})
 add_library(contra_static STATIC ${src_lib})
 install(TARGETS contra contra_static LIBRARY DESTINATION lib)
 install(FILES include/contra.h DESTINATION include)
+install(FILES deps/parson/parson.h DESTINATION include/parson)
 install(DIRECTORY include/contra DESTINATION include)
 
 if(NOT (${CMAKE_BUILD_TYPE} MATCHES Release))

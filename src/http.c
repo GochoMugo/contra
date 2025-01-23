@@ -44,8 +44,8 @@ int contra_http_buffer_new(Buffer **out) {
 
   *out = buffer;
 
-_on_error:
-_cleanup:
+on_error:
+cleanup:
   return ret_code;
 }
 
@@ -88,12 +88,12 @@ int contra_http_get(contra_http_response **out, const char *url) {
 
   *out = res;
 
-_on_error:
+on_error:
   if (ret_code != CONTRA_ERR_HTTP) {
     contra_http_response_free(&res);
     contra_http_buffer_free(&buffer);
   }
-_cleanup:
+cleanup:
   if (NULL != curl)
     curl_easy_cleanup(curl);
   return ret_code;
@@ -153,7 +153,7 @@ int contra_http_post(contra_http_response **out, const char *url,
   res->body = buffer->data;
   curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &(res->status_code));
 
-_on_error:
+on_error:
   if (NULL != buffer) {
     if (NULL != buffer->data && (NULL == res || NULL == res->body))
       free(buffer->data);
@@ -161,7 +161,7 @@ _on_error:
   }
   if (NULL != res && ret_code != CONTRA_ERR_HTTP)
     contra_http_response_free(&res);
-_cleanup:
+cleanup:
   if (NULL != curl)
     curl_easy_cleanup(curl);
   if (NULL != headers)
@@ -197,9 +197,9 @@ int contra_http_response_new(contra_http_response **out) {
 
   *out = res;
 
-_on_error:
+on_error:
   contra_http_response_free(&res);
-_cleanup:
+cleanup:
   return ret_code;
 }
 

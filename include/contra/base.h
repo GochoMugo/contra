@@ -28,16 +28,16 @@ static int __contra_ce = 0;
 /**
  * Defines error section of the function.
  */
-#define _on_error                                                              \
-  goto cleanup;                                                                \
-  on_error
+#define on_error                                                               \
+  goto __contra_cleanup;                                                       \
+  __contra_on_error
 
 /**
  * Defines clean-up section of the function.
  */
-#define _cleanup                                                               \
-  goto cleanup;                                                                \
-  cleanup
+#define cleanup                                                                \
+  goto __contra_cleanup;                                                       \
+  __contra_cleanup
 
 /**
  * Set 'ret_code' to 'result' and jump to cleanup.
@@ -46,7 +46,7 @@ static int __contra_ce = 0;
   {                                                                            \
     __contra_rc = result;                                                      \
     ret_code = __contra_rc;                                                    \
-    goto cleanup;                                                              \
+    goto __contra_cleanup;                                                     \
   }
 
 /**
@@ -59,14 +59,14 @@ static int __contra_ce = 0;
   if (0 > __contra_rc) {                                                       \
     contra_error_set_cb(__contra_rc);                                          \
     ret_code = __contra_rc;                                                    \
-    goto on_error;                                                             \
+    goto __contra_on_error;                                                    \
   }
 #else
 #define return_err(result)                                                     \
   __contra_rc = result;                                                        \
   if (0 > __contra_rc) {                                                       \
     ret_code = __contra_rc;                                                    \
-    goto on_error;                                                             \
+    goto __contra_on_error;                                                    \
   }
 #endif
 
@@ -81,7 +81,7 @@ static int __contra_ce = 0;
   if (0 > __contra_rc) {                                                       \
     contra_error_set_cb(__contra_ce);                                          \
     ret_code = __contra_ce;                                                    \
-    goto on_error;                                                             \
+    goto __contra_on_error;                                                    \
   }
 #else
 #define return_err_ext(result, custom_err)                                     \
@@ -89,7 +89,7 @@ static int __contra_ce = 0;
   __contra_ce = custom_err;                                                    \
   if (0 > __contra_rc) {                                                       \
     ret_code = __contra_ce;                                                    \
-    goto on_error;                                                             \
+    goto __contra_on_error;                                                    \
   }
 #endif
 
@@ -102,14 +102,14 @@ static int __contra_ce = 0;
     __contra_ce = custom_err;                                                  \
     contra_error_set_cb(__contra_ce);                                          \
     ret_code = __contra_ce;                                                    \
-    goto on_error;                                                             \
+    goto __contra_on_error;                                                    \
   }
 #else
 #define return_err_now(custom_err)                                             \
   {                                                                            \
     __contra_ce = custom_err;                                                  \
     ret_code = __contra_ce;                                                    \
-    goto on_error;                                                             \
+    goto __contra_on_error;                                                    \
   }
 #endif
 

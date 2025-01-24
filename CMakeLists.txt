@@ -8,6 +8,7 @@ set(bin_dir ${CMAKE_CURRENT_BINARY_DIR})
 
 # library: libcontra, libcontra_static
 set(src_lib
+    src/fs.c
     src/http.c
     src/path.c
     src/string.c
@@ -36,6 +37,12 @@ if(NOT (${CMAKE_BUILD_TYPE} MATCHES Release))
 
     # task: tests.assert
     add_custom_target(tests.assert COMMAND ${root_dir}/test/assert/assert.test.sh)
+
+    # task: tests.fs
+    add_executable(fs.test EXCLUDE_FROM_ALL test/fs.test.c)
+    add_dependencies(fs.test cmocka)
+    add_custom_target(tests.fs COMMAND ${bin_dir}/fs.test)
+    add_dependencies(tests.fs fs.test)
 
     # task: tests.http
     add_executable(http.test EXCLUDE_FROM_ALL test/http.test.c)
@@ -71,6 +78,7 @@ if(NOT (${CMAKE_BUILD_TYPE} MATCHES Release))
     add_custom_target(tests)
     add_dependencies(tests
         tests.assert
+        tests.fs
         tests.http
         tests.is
         tests.math

@@ -16,6 +16,7 @@
 #include "contra/assert.h"
 #include "contra/base.h"
 #include "contra/error.h"
+#include "contra/fs.h"
 #include "contra/http.h"
 #include "contra/is.h"
 #include "contra/math.h"

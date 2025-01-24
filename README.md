@@ -44,6 +44,7 @@ make tests
 
 # Run subset of tests
 make tests.assert
+make tests.fs
 make tests.http
 make tests.is
 make tests.math

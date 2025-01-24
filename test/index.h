@@ -17,4 +17,8 @@
 
 #include "../src/index.h"
 
+#define assert_ok(result) assert_int_equal(result, 0)
+
+#define assert_contains(haystack, needle) assert_true(strstr(haystack, needle))
+
 #endif

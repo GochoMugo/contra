@@ -16,6 +16,10 @@ typedef enum {
   CONTRA_ERR_MALLOC,
   /** Bad arguments were provided. */
   CONTRA_ERR_BAD_ARGS,
+  /** Failed to open a file. */
+  CONTRA_ERR_FS_OPEN,
+  /** Failed to read a file. */
+  CONTRA_ERR_FS_READ,
   /** An HTTP error occurred. */
   CONTRA_ERR_HTTP,
 } contra_error_code;

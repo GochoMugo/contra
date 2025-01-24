@@ -2,10 +2,6 @@
 
 static contra_http_response *out = NULL;
 
-#define assert_ok(result) assert_int_equal(result, 0)
-
-#define assert_contains(haystack, needle) assert_true(strstr(haystack, needle))
-
 void tests_contra_http_get(void **state) {
   char *no_network = getenv("CONTRA_TEST_NO_NETWORK");
   if (NULL != no_network) {

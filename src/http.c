@@ -104,36 +104,16 @@ int contra_http_post(contra_http_response **out, const char *url,
   int ret_code = 0;
   Buffer *buffer = NULL;
   CURL *curl = NULL;
-  struct curl_slist *headers = NULL;
   contra_http_response *res = NULL;
   CURLcode res_ret;
 
-  res = malloc(sizeof(contra_http_response));
-  if (NULL == res) {
-    return_err_now(CONTRA_ERR_MALLOC);
-  }
-  res->body = NULL;
-  res->error_code = 0;
-  res->error_message = malloc(CURL_ERROR_SIZE);
-  if (NULL == res->error_message) {
-    return_err_now(CONTRA_ERR_MALLOC);
-  }
-  res->status_code = 0;
-  *out = res;
-
-  buffer = malloc(sizeof(Buffer));
-  if (NULL == buffer) {
-    return_err_now(CONTRA_ERR_MALLOC);
-  }
-  buffer->data = NULL;
-  buffer->size = 0;
-
-  headers = curl_slist_append(headers, "Content-Type: application/json");
+  return_err(contra_http_response_new(&res));
+  return_err(contra_http_buffer_new(&buffer));
 
   curl = curl_easy_init();
   curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
   curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, res->error_message);
-  curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+  curl_easy_setopt(curl, CURLOPT_HTTPHEADER, contra_http_default_headers());
   if (NULL != body) {
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, body);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE_LARGE,
@@ -147,25 +127,23 @@ int contra_http_post(contra_http_response **out, const char *url,
   res_ret = curl_easy_perform(curl);
   if (CURLE_OK != res_ret) {
     res->error_code = res_ret;
+    *out = res;
     return_err_now(CONTRA_ERR_HTTP);
   }
 
   res->body = buffer->data;
   curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &(res->status_code));
 
+  *out = res;
+
 on_error:
-  if (NULL != buffer) {
-    if (NULL != buffer->data && (NULL == res || NULL == res->body))
-      free(buffer->data);
-    free(buffer);
-  }
-  if (NULL != res && ret_code != CONTRA_ERR_HTTP)
+  if (ret_code != CONTRA_ERR_HTTP) {
     contra_http_response_free(&res);
+    contra_http_buffer_free(&buffer);
+  }
 cleanup:
   if (NULL != curl)
     curl_easy_cleanup(curl);
-  if (NULL != headers)
-    curl_slist_free_all(headers);
   return ret_code;
 }
 

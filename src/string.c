@@ -19,7 +19,7 @@ int contra_str_copy(char **out, const char *str) {
   return 0;
 }
 
-int contra_str_trim(char **out, char *str) {
+int contra_str_trim(char **out, const char *str) {
   int ret_code = 0;
   int len = strlen(str);
   char *temp = NULL;

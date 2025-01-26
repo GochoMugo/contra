@@ -21,9 +21,9 @@ int contra_str_copy(char **out, const char *str);
  * Trims whitespace from the start and end of the string.
  *
  * @param  out Trimmed string
- * @param  str String to be trimmed∏
+ * @param  str String to be trimmed
  * @return 0 or error code
  */
-int contra_str_trim(char **out, char *str);
+int contra_str_trim(char **out, const char *str);
 
 #endif

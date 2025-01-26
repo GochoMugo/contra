@@ -10,6 +10,7 @@
 
 #include <assert.h>
 #include <contra.h>
+#include <ctype.h>
 #include <curl/curl.h>
 #include <errno.h>
 #include <stdarg.h>

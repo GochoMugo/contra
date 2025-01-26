@@ -21,9 +21,19 @@ void tests_contra_str_copy(void **state) {
   assert_null(out[3]);
 }
 
+void tests_contra_str_trim(void **state) {
+  assert_ok(contra_str_trim(&out, "foo"), "foo");
+  assert_ok(contra_str_trim(&out, " foo"), "foo");
+  assert_ok(contra_str_trim(&out, "foo "), "foo");
+  assert_ok(contra_str_trim(&out, " foo "), "foo");
+  assert_ok(contra_str_trim(&out, "   foo   "), "foo");
+  assert_ok(contra_str_trim(&out, "\nfoo\n"), "foo");
+}
+
 int main(void) {
   const struct CMUnitTest tests[] = {
       cmocka_unit_test(tests_contra_str_copy),
+      cmocka_unit_test(tests_contra_str_trim),
   };
   return cmocka_run_group_tests(tests, NULL, NULL);
 }

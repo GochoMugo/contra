@@ -12,6 +12,7 @@ set(src_lib
     src/http.c
     src/path.c
     src/string.c
+    src/time.c
     deps/parson/parson.c
 )
 include_directories(${root_dir}/include ${root_dir}/deps $ENV{HOME}/.local/include)

@@ -15,6 +15,9 @@
 #define true 1
 #define false 0
 
+/** Number of items in an array. */
+#define array_size(arr) sizeof(arr) / sizeof(arr[0])
+
 /**
  * Defines error section of the function.
  */

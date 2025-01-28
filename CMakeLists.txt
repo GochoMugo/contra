@@ -40,6 +40,12 @@ if(NOT (${CMAKE_BUILD_TYPE} MATCHES Release))
     # task: tests.assert
     add_custom_target(tests.assert COMMAND ${root_dir}/test/assert/assert.test.sh)
 
+    # task: tests.base
+    add_executable(base.test EXCLUDE_FROM_ALL test/base.test.c)
+    add_dependencies(base.test cmocka)
+    add_custom_target(tests.base COMMAND ${bin_dir}/base.test)
+    add_dependencies(tests.base base.test)
+
     # task: tests.fs
     add_executable(fs.test EXCLUDE_FROM_ALL test/fs.test.c)
     add_dependencies(fs.test cmocka)
@@ -86,6 +92,7 @@ if(NOT (${CMAKE_BUILD_TYPE} MATCHES Release))
     add_custom_target(tests)
     add_dependencies(tests
         tests.assert
+        tests.base
         tests.fs
         tests.http
         tests.is

@@ -49,6 +49,7 @@ make tests.http
 make tests.is
 make tests.math
 make tests.path
+make tests.proc
 make tests.string
 ```
 

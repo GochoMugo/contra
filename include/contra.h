@@ -21,6 +21,7 @@
 #include "contra/is.h"
 #include "contra/math.h"
 #include "contra/path.h"
+#include "contra/proc.h"
 #include "contra/string.h"
 #include "contra/time.h"
 #include "parson/parson.h"

@@ -22,6 +22,8 @@ typedef enum {
   CONTRA_ERR_FS_READ,
   /** An HTTP error occurred. */
   CONTRA_ERR_HTTP,
+  /** Failed to execute a command. */
+  CONTRA_ERR_PROC_EXEC,
 } contra_error_code;
 
 #endif

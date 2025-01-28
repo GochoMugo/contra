@@ -11,6 +11,7 @@ set(src_lib
     src/fs.c
     src/http.c
     src/path.c
+    src/proc.c
     src/string.c
     src/time.c
     deps/parson/parson.c
@@ -69,6 +70,12 @@ if(NOT (${CMAKE_BUILD_TYPE} MATCHES Release))
     add_custom_target(tests.path COMMAND ${bin_dir}/path.test)
     add_dependencies(tests.path path.test)
 
+    # task: tests.proc
+    add_executable(proc.test EXCLUDE_FROM_ALL test/proc.test.c)
+    add_dependencies(proc.test cmocka)
+    add_custom_target(tests.proc COMMAND ${bin_dir}/proc.test)
+    add_dependencies(tests.proc proc.test)
+
     # task: tests.string
     add_executable(string.test EXCLUDE_FROM_ALL test/string.test.c)
     add_dependencies(string.test cmocka)
@@ -84,6 +91,7 @@ if(NOT (${CMAKE_BUILD_TYPE} MATCHES Release))
         tests.is
         tests.math
         tests.path
+        tests.proc
         tests.string
     )
 endif()

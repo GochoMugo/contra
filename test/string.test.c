@@ -2,17 +2,10 @@
 
 static char *out = NULL;
 
-#define assert_ok(result, expected)                                            \
-  assert_int_equal(result, 0);                                                 \
-  assert_string_equal(out, expected);                                          \
-  out = NULL
-
-#define assert_fail(result, expected) assert_int_equal(result, expected)
-
 void tests_contra_str_copy(void **state) {
-  assert_ok(contra_str_copy(&out, "hello"), "hello");
-  assert_ok(contra_str_copy(&out, ""), "");
-  assert_ok(contra_str_copy(&out, " "), " ");
+  assert_out(contra_str_copy(&out, "hello"), "hello");
+  assert_out(contra_str_copy(&out, ""), "");
+  assert_out(contra_str_copy(&out, " "), " ");
 
   assert_int_equal(contra_str_copy(&out, "abc"), 0);
   // correct length
@@ -22,12 +15,12 @@ void tests_contra_str_copy(void **state) {
 }
 
 void tests_contra_str_trim(void **state) {
-  assert_ok(contra_str_trim(&out, "foo"), "foo");
-  assert_ok(contra_str_trim(&out, " foo"), "foo");
-  assert_ok(contra_str_trim(&out, "foo "), "foo");
-  assert_ok(contra_str_trim(&out, " foo "), "foo");
-  assert_ok(contra_str_trim(&out, "   foo   "), "foo");
-  assert_ok(contra_str_trim(&out, "\nfoo\n"), "foo");
+  assert_out(contra_str_trim(&out, "foo"), "foo");
+  assert_out(contra_str_trim(&out, " foo"), "foo");
+  assert_out(contra_str_trim(&out, "foo "), "foo");
+  assert_out(contra_str_trim(&out, " foo "), "foo");
+  assert_out(contra_str_trim(&out, "   foo   "), "foo");
+  assert_out(contra_str_trim(&out, "\nfoo\n"), "foo");
 }
 
 int main(void) {

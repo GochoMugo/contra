@@ -17,8 +17,22 @@
 
 #include "../src/index.h"
 
+static int rc = 0;
+
 #define assert_ok(result) assert_int_equal(result, 0)
 
 #define assert_contains(haystack, needle) assert_true(strstr(haystack, needle))
+
+#define assert_fail(result, expected)                                          \
+  out = NULL;                                                                  \
+  rc = result;                                                                 \
+  assert_true(0 > rc);                                                         \
+  assert_int_equal(rc, expected);
+
+#define assert_out(result, expected)                                           \
+  out = NULL;                                                                  \
+  rc = result;                                                                 \
+  assert_int_equal(rc, 0);                                                     \
+  assert_string_equal(out, expected);
 
 #endif

@@ -11,11 +11,10 @@ int contra_proc_exec(char **out, const char *command) {
   int ret_code = 0;
   int exit_code = -1;
   char *output = NULL;
-  int output_size = 0;
+  size_t output_size = 0;
   FILE *proc = NULL;
   int proc_status = -1;
-  int read_bytes = 0;
-  int reads = 0;
+  size_t read_bytes = 0;
 
   proc = popen(command, "r");
   if (NULL == proc) {
@@ -24,19 +23,17 @@ int contra_proc_exec(char **out, const char *command) {
 
   do {
     size_t chunk_size = sizeof(char) * CONTRA_PROC_EXEC_BUFFER_SIZE;
-    size_t offset = chunk_size * reads;
-    size_t buffer_size = chunk_size * (reads + 1);
+    size_t buffer_size = output_size + chunk_size;
 
     output = realloc(output, buffer_size);
     if (NULL == output) {
       return_err_now(CONTRA_ERR_MALLOC);
     }
 
-    read_bytes = read(fileno(proc), output + offset, chunk_size);
+    read_bytes = read(fileno(proc), output + output_size, chunk_size);
     return_err(read_bytes);
 
     output_size += read_bytes;
-    reads++;
   } while (0 < read_bytes);
 
   proc_status = pclose(proc);

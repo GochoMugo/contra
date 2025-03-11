@@ -155,6 +155,70 @@ cleanup:
   return ret_code;
 }
 
+int contra_http_request_append_header(contra_http_request *req,
+                                      const char *header) {
+  int ret_code = 0;
+  char **headers = req->headers;
+
+  if (req->headers_count) {
+    headers = realloc(headers, sizeof(char *) * (req->headers_count + 1));
+  } else {
+    headers = malloc(sizeof(char *));
+  }
+  if (NULL == headers) {
+    return_err_now(CONTRA_ERR_MALLOC);
+  }
+  return_err(contra_str_copy(&(headers[req->headers_count]), header));
+
+  req->headers = headers;
+  req->headers_count += 1;
+
+on_error:
+cleanup:
+  return ret_code;
+}
+
+void contra_http_request_free(contra_http_request **req) {
+  contra_http_request *r = *req;
+  if (NULL == r)
+    return;
+  if (NULL != r->headers) {
+    for (int i = 0; i < r->headers_count; i++) {
+      free(r->headers[i]);
+    }
+    free(r->headers);
+  }
+  if (NULL != r->body)
+    free(r->body);
+  if (NULL != r->url)
+    free(r->url);
+  free(r);
+  *req = NULL;
+}
+
+int contra_http_request_new(contra_http_request **out, const char *url) {
+  int ret_code = 0;
+  contra_http_request *req = malloc(sizeof(contra_http_request));
+  if (NULL == req) {
+    return_err_now(CONTRA_ERR_MALLOC);
+  }
+
+  req->body = NULL;
+  req->headers = NULL;
+  req->headers_count = 0;
+  req->url = NULL;
+
+  return_err(contra_str_copy(&(req->url), url));
+
+  *out = req;
+
+on_error:
+  if (NULL != req)
+    contra_http_request_free(&req);
+cleanup:
+  return ret_code;
+}
+
 void contra_http_response_free(contra_http_response **res) {
   contra_http_response *r = *res;
   if (NULL == r)

@@ -45,6 +45,35 @@ int contra_http_post(contra_http_response **out,
                      const contra_http_request *req);
 
 /**
+ * Appends a header to the request.
+ *
+ * @param out Request
+ * @param header Header
+ */
+int contra_http_request_append_header(contra_http_request *req,
+                                      const char *header);
+
+/**
+ * Frees a HTTP request.
+ *
+ * @param  req Request
+ */
+void contra_http_request_free(contra_http_request **req);
+
+/**
+ * Creates a new HTTP request.
+ *
+ * Any memory that is assigned to any request property
+ * is considered owned by the request object.
+ *
+ * The `url` passed is copied into the request object.
+ *
+ * @param out Request
+ * @param url URL
+ */
+int contra_http_request_new(contra_http_request **out, const char *url);
+
+/**
  * Frees a HTTP response.
  *
  * @param  res Response

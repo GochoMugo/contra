@@ -11,6 +11,8 @@
 /** HTTP request. */
 typedef struct contra_http_request {
   char *body;
+  char **headers;
+  int headers_count;
   char *url;
 } contra_http_request;
 

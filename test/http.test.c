@@ -2,6 +2,8 @@
 
 const contra_http_request null_req = {
     .body = NULL,
+    .headers = NULL,
+    .headers_count = 0,
     .url = NULL,
 };
 
@@ -23,6 +25,19 @@ void tests_contra_http_get(void **state) {
   assert_int_equal(res->status_code, 200);
   assert_contains(res->body, "\"Content-Type\": \"application/json\"");
   assert_contains(res->body, "\"foo\": \"bar\"");
+  reset();
+
+  // Custom headers.
+  req.url = "https://eu.httpbin.org/get";
+  req.headers = malloc(sizeof(char *) * 2);
+  assert(req.headers);
+  req.headers_count = 2;
+  req.headers[0] = "X-Header-One: foo";
+  req.headers[1] = "X-Header-Two: bar";
+  assert_ok(contra_http_get(&res, &req));
+  assert_contains(res->body, "\"X-Header-One\": \"foo\"");
+  assert_contains(res->body, "\"X-Header-Two\": \"bar\"");
+  free(req.headers);
   reset();
 
   // Status code is not 200.
@@ -52,6 +67,18 @@ void tests_contra_http_post(void **state) {
   assert_int_equal(res->status_code, 200);
   assert_contains(res->body, "\"Content-Type\": \"application/json\"");
   assert_contains(res->body, "\"foo\": \"bar\"");
+  reset();
+
+  // Custom headers.
+  req.url = "https://eu.httpbin.org/post";
+  req.body = "{\"foo\":\"bar\"}";
+  req.headers = malloc(sizeof(char *));
+  assert(req.headers);
+  req.headers_count = 1;
+  req.headers[0] = "X-Header-One: foo";
+  assert_ok(contra_http_post(&res, &req));
+  assert_contains(res->body, "\"X-Header-One\": \"foo\"");
+  free(req.headers);
   reset();
 
   // Request body is NULL.

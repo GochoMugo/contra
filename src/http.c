@@ -14,11 +14,10 @@ typedef struct Buffer {
 
 void contra_http_buffer_free(Buffer **buffer);
 int contra_http_buffer_new(Buffer **out);
-struct curl_slist *contra_http_default_headers();
+struct curl_slist *contra_http_set_headers(struct curl_slist *headers,
+                                           const contra_http_request *req);
 int contra_http_response_new(contra_http_response **out);
 size_t write_response(void *contents, size_t size, size_t nmemb, void *userp);
-
-static struct curl_slist *default_headers = NULL;
 
 void contra_http_buffer_free(Buffer **buffer) {
   Buffer *b = *buffer;
@@ -48,12 +47,13 @@ cleanup:
   return ret_code;
 }
 
-struct curl_slist *contra_http_default_headers() {
-  if (NULL == default_headers) {
-    default_headers =
-        curl_slist_append(default_headers, "Content-Type: application/json");
+struct curl_slist *contra_http_set_headers(struct curl_slist *headers,
+                                           const contra_http_request *req) {
+  headers = curl_slist_append(headers, "Content-Type: application/json");
+  for (int i = 0; i < req->headers_count; i++) {
+    headers = curl_slist_append(headers, req->headers[i]);
   }
-  return default_headers;
+  return headers;
 }
 
 int contra_http_get(contra_http_response **out,
@@ -61,6 +61,7 @@ int contra_http_get(contra_http_response **out,
   int ret_code = 0;
   Buffer *buffer = NULL;
   CURL *curl = NULL;
+  struct curl_slist *headers = NULL;
   contra_http_response *res = NULL;
   CURLcode res_ret;
 
@@ -70,7 +71,8 @@ int contra_http_get(contra_http_response **out,
   curl = curl_easy_init();
   curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
   curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, res->error_message);
-  curl_easy_setopt(curl, CURLOPT_HTTPHEADER, contra_http_default_headers());
+  curl_easy_setopt(curl, CURLOPT_HTTPHEADER,
+                   contra_http_set_headers(headers, req));
   curl_easy_setopt(curl, CURLOPT_URL, req->url);
   curl_easy_setopt(curl, CURLOPT_USERAGENT, "contra");
   curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)buffer);
@@ -94,6 +96,8 @@ on_error:
     contra_http_buffer_free(&buffer);
   }
 cleanup:
+  if (NULL != headers)
+    curl_slist_free_all(headers);
   if (NULL != curl)
     curl_easy_cleanup(curl);
   return ret_code;
@@ -104,6 +108,7 @@ int contra_http_post(contra_http_response **out,
   int ret_code = 0;
   Buffer *buffer = NULL;
   CURL *curl = NULL;
+  struct curl_slist *headers = NULL;
   contra_http_response *res = NULL;
   CURLcode res_ret;
 
@@ -113,7 +118,8 @@ int contra_http_post(contra_http_response **out,
   curl = curl_easy_init();
   curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
   curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, res->error_message);
-  curl_easy_setopt(curl, CURLOPT_HTTPHEADER, contra_http_default_headers());
+  curl_easy_setopt(curl, CURLOPT_HTTPHEADER,
+                   contra_http_set_headers(headers, req));
   if (NULL != req->body) {
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, req->body);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE_LARGE,
@@ -142,6 +148,8 @@ on_error:
     contra_http_buffer_free(&buffer);
   }
 cleanup:
+  if (NULL != headers)
+    curl_slist_free_all(headers);
   if (NULL != curl)
     curl_easy_cleanup(curl);
   return ret_code;

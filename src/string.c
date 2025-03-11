@@ -8,6 +8,10 @@
 #include "index.h"
 
 int contra_str_copy(char **out, const char *str) {
+  if (NULL == str) {
+    *out = NULL;
+    return 0;
+  }
   int size = strlen(str);
   char *ptr = malloc(size + 1);
   if (NULL == ptr) {

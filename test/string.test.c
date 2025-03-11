@@ -12,6 +12,10 @@ void tests_contra_str_copy(void **state) {
   assert_int_equal(strlen(out), 3);
   // null-terminated
   assert_null(out[3]);
+
+  // Does not break on null.
+  assert_ok(contra_str_copy(&out, NULL));
+  assert_null(out);
 }
 
 void tests_contra_str_trim(void **state) {

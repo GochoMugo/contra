@@ -8,6 +8,12 @@
 #ifndef _CONTRA_http_h_
 #define _CONTRA_http_h_ 1
 
+/** HTTP request. */
+typedef struct contra_http_request {
+  char *body;
+  char *url;
+} contra_http_request;
+
 /** HTTP response. */
 typedef struct contra_http_response {
   char *body;
@@ -23,7 +29,7 @@ typedef struct contra_http_response {
  * @param url URL
  * @return 0 or error code
  */
-int contra_http_get(contra_http_response **out, const char * url);
+int contra_http_get(contra_http_response **out, const contra_http_request *req);
 
 /**
  * Sends a POST request to the specified URL.
@@ -33,8 +39,8 @@ int contra_http_get(contra_http_response **out, const char * url);
  * @param  body Body
  * @return 0 or error code
  */
-int contra_http_post(contra_http_response **out, const char *url,
-                     const char *body);
+int contra_http_post(contra_http_response **out,
+                     const contra_http_request *req);
 
 /**
  * Frees a HTTP response.

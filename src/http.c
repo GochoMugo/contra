@@ -15,7 +15,6 @@ typedef struct Buffer {
 void contra_http_buffer_free(Buffer **buffer);
 int contra_http_buffer_new(Buffer **out);
 struct curl_slist *contra_http_default_headers();
-void contra_http_response_free(contra_http_response **res);
 int contra_http_response_new(contra_http_response **out);
 size_t write_response(void *contents, size_t size, size_t nmemb, void *userp);
 
@@ -57,7 +56,8 @@ struct curl_slist *contra_http_default_headers() {
   return default_headers;
 }
 
-int contra_http_get(contra_http_response **out, const char *url) {
+int contra_http_get(contra_http_response **out,
+                    const contra_http_request *req) {
   int ret_code = 0;
   Buffer *buffer = NULL;
   CURL *curl = NULL;
@@ -71,7 +71,7 @@ int contra_http_get(contra_http_response **out, const char *url) {
   curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
   curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, res->error_message);
   curl_easy_setopt(curl, CURLOPT_HTTPHEADER, contra_http_default_headers());
-  curl_easy_setopt(curl, CURLOPT_URL, url);
+  curl_easy_setopt(curl, CURLOPT_URL, req->url);
   curl_easy_setopt(curl, CURLOPT_USERAGENT, "contra");
   curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)buffer);
   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_response);
@@ -99,8 +99,8 @@ cleanup:
   return ret_code;
 }
 
-int contra_http_post(contra_http_response **out, const char *url,
-                     const char *body) {
+int contra_http_post(contra_http_response **out,
+                     const contra_http_request *req) {
   int ret_code = 0;
   Buffer *buffer = NULL;
   CURL *curl = NULL;
@@ -114,12 +114,12 @@ int contra_http_post(contra_http_response **out, const char *url,
   curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
   curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, res->error_message);
   curl_easy_setopt(curl, CURLOPT_HTTPHEADER, contra_http_default_headers());
-  if (NULL != body) {
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, body);
+  if (NULL != req->body) {
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, req->body);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE_LARGE,
-                     (curl_off_t)strlen(body));
+                     (curl_off_t)strlen(req->body));
   }
-  curl_easy_setopt(curl, CURLOPT_URL, url);
+  curl_easy_setopt(curl, CURLOPT_URL, req->url);
   curl_easy_setopt(curl, CURLOPT_USERAGENT, "contra");
   curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)buffer);
   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_response);

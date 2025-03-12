@@ -28,6 +28,8 @@ void tests_contra_proc_exec(void **state) {
   assert_out(contra_proc_exec(&out, "true"), "");
   assert_out(contra_proc_exec(&out, "/bin/echo -n foo"), "foo");
   assert_out(contra_proc_exec(&out, "/bin/echo foo"), "foo\n");
+  assert_out(contra_proc_exec(&out, "echo foo"), "foo\n");
+  assert_out(contra_proc_exec(&out, "echo foo | cat"), "foo\n");
 
   assert_out(contra_proc_exec(&out, "cat ../test/data/long_text.txt"),
              LONG_TEXT);

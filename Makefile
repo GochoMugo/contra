@@ -6,8 +6,9 @@ help:
 	@echo
 
 clean:
-	rm -rf build deps
-		
+	rm -rf build deps doc/html doc/man
+	git checkout deps
+
 deps:
 	git submodule init
 	git submodule update

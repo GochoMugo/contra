@@ -3,6 +3,8 @@
  *
  * The MIT License (MIT)
  * Copyright (c) 2016 GochoMugo <mugo@forfuture.co.ke>
+ *
+ * \file http.h
  */
 
 #ifndef _CONTRA_http_h_

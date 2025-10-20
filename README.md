@@ -2,7 +2,7 @@
 
 > A minimal standard library for C
 
-## introduction
+## Introduction
 
 **contra** is a minimal standard library re-worked and re-designed
 for simplicity and reusability. It is primarily developed to make it
@@ -27,6 +27,9 @@ easier writing C applications, using an API very similar to Node.js'.
 ### installation
 
 ```bash
+# Install dependencies.
+make deps
+
 # Create build directory.
 mkdir build && cd build
 
@@ -56,7 +59,7 @@ make tests.string
 
 
 <a name="license"></a>
-## license
+## License
 
 ***The MIT License (MIT)***
 

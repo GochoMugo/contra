@@ -1,5 +1,7 @@
 # build artefacts
 build/
+doc/html
+doc/man
 .cache/
 
 # python bytecodes

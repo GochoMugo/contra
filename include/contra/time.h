@@ -3,6 +3,8 @@
  *
  * The MIT License (MIT)
  * Copyright (c) 2016 GochoMugo <mugo@forfuture.co.ke>
+ *
+ * \file time.h
  */
 
 #ifndef _CONTRA_time_h_

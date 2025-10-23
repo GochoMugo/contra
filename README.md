@@ -42,19 +42,19 @@ make
 # Install library (usually under /usr/local).
 make install
 
-# Run all tests.
-make tests
+# Run all test.
+make test
 
 # Run subset of tests
-make tests.assert
-make tests.base
-make tests.fs
-make tests.http
-make tests.is
-make tests.math
-make tests.path
-make tests.proc
-make tests.string
+make test.assert
+make test.base
+make test.fs
+make test.http
+make test.is
+make test.math
+make test.path
+make test.proc
+make test.string
 ```
 
 

@@ -37,68 +37,68 @@ if(NOT (${CMAKE_BUILD_TYPE} MATCHES Release))
         WORKING_DIRECTORY ${root_dir}/deps/cmocka
     )
 
-    # task: tests.assert
-    add_custom_target(tests.assert COMMAND ${root_dir}/test/assert/assert.test.sh)
+    # task: test.assert
+    add_custom_target(test.assert COMMAND ${root_dir}/test/assert/assert.test.sh)
 
-    # task: tests.base
+    # task: test.base
     add_executable(base.test EXCLUDE_FROM_ALL test/base.test.c)
     add_dependencies(base.test cmocka)
-    add_custom_target(tests.base COMMAND ${bin_dir}/base.test)
-    add_dependencies(tests.base base.test)
+    add_custom_target(test.base COMMAND ${bin_dir}/base.test)
+    add_dependencies(test.base base.test)
 
-    # task: tests.fs
+    # task: test.fs
     add_executable(fs.test EXCLUDE_FROM_ALL test/fs.test.c)
     add_dependencies(fs.test cmocka)
-    add_custom_target(tests.fs COMMAND ${bin_dir}/fs.test)
-    add_dependencies(tests.fs fs.test)
+    add_custom_target(test.fs COMMAND ${bin_dir}/fs.test)
+    add_dependencies(test.fs fs.test)
 
-    # task: tests.http
+    # task: test.http
     add_executable(http.test EXCLUDE_FROM_ALL test/http.test.c)
     add_dependencies(http.test cmocka)
-    add_custom_target(tests.http COMMAND ${bin_dir}/http.test)
-    add_dependencies(tests.http http.test)
+    add_custom_target(test.http COMMAND ${bin_dir}/http.test)
+    add_dependencies(test.http http.test)
 
-    # task: tests.is
+    # task: test.is
     add_executable(is.test EXCLUDE_FROM_ALL test/is.test.c)
     add_dependencies(is.test cmocka)
-    add_custom_target(tests.is COMMAND ${bin_dir}/is.test)
-    add_dependencies(tests.is is.test)
+    add_custom_target(test.is COMMAND ${bin_dir}/is.test)
+    add_dependencies(test.is is.test)
 
-    # task: tests.math
+    # task: test.math
     add_executable(math.test EXCLUDE_FROM_ALL test/math.test.c)
     add_dependencies(math.test cmocka)
-    add_custom_target(tests.math COMMAND ${bin_dir}/math.test)
-    add_dependencies(tests.math math.test)
+    add_custom_target(test.math COMMAND ${bin_dir}/math.test)
+    add_dependencies(test.math math.test)
 
-    # task: tests.path
+    # task: test.path
     add_executable(path.test EXCLUDE_FROM_ALL test/path.test.c)
     add_dependencies(path.test cmocka)
-    add_custom_target(tests.path COMMAND ${bin_dir}/path.test)
-    add_dependencies(tests.path path.test)
+    add_custom_target(test.path COMMAND ${bin_dir}/path.test)
+    add_dependencies(test.path path.test)
 
-    # task: tests.proc
+    # task: test.proc
     add_executable(proc.test EXCLUDE_FROM_ALL test/proc.test.c)
     add_dependencies(proc.test cmocka)
-    add_custom_target(tests.proc COMMAND ${bin_dir}/proc.test)
-    add_dependencies(tests.proc proc.test)
+    add_custom_target(test.proc COMMAND ${bin_dir}/proc.test)
+    add_dependencies(test.proc proc.test)
 
-    # task: tests.string
+    # task: test.string
     add_executable(string.test EXCLUDE_FROM_ALL test/string.test.c)
     add_dependencies(string.test cmocka)
-    add_custom_target(tests.string COMMAND ${bin_dir}/string.test)
-    add_dependencies(tests.string string.test)
+    add_custom_target(test.string COMMAND ${bin_dir}/string.test)
+    add_dependencies(test.string string.test)
 
     # task: tests
-    add_custom_target(tests)
-    add_dependencies(tests
-        tests.assert
-        tests.base
-        tests.fs
-        tests.http
-        tests.is
-        tests.math
-        tests.path
-        tests.proc
-        tests.string
+    add_custom_target(test)
+    add_dependencies(test
+        test.assert
+        test.base
+        test.fs
+        test.http
+        test.is
+        test.math
+        test.path
+        test.proc
+        test.string
     )
 endif()

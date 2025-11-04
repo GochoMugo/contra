@@ -1,7 +1,7 @@
 #!/usr/bin/env crun
-/* -Wall -O3 -L../../build -I../../include */
+/* -Wall -O3 -L../../build -I../../include -I ../../deps */
 
-#include "../../src/index.h"
+#include <contra.h>
 
 #define is(i) contra_is_str_eq(argv[1], i)
 

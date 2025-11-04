@@ -13,7 +13,11 @@
 #define CONTRA_VERSION_MINOR 0
 #define CONTRA_VERSION_PATCH 0
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/wait.h>
+
 #include "contra/assert.h"
 #include "contra/base.h"
 #include "contra/error.h"
